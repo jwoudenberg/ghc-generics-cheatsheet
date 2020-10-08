@@ -14,49 +14,68 @@ main =
     Browser.sandbox
         { init = ()
         , update = \_ _ -> ()
-        , view = \_ -> Html.toUnstyled view
+        , view = \_ -> Html.toUnstyled <| Html.div [] (List.map view examples)
         }
 
 
-view : Html msg
-view =
-    Html.table []
-        [ Html.tr []
-            [ Html.th [] []
-            , Html.th [] [ Html.text "Type" ]
-            , Html.th [] [ Html.text "Example Value" ]
-            ]
-        , Html.tr []
-            [ Html.th [] [ Html.text "Original" ]
-            , Html.td [] [ Html.code [] [ Html.text "newtype Id = Id Int" ] ]
-            , Html.td [] [ Html.code [] [ Html.text "Id 5" ] ]
-            ]
-        , Html.tr []
-            [ Html.th [] [ Html.text "Generic Representation" ]
-            , Html.td []
-                [ Html.code
-                    [ Attr.css [ Css.whiteSpace Css.pre ]
-                    ]
-                    [ """
-                      type instance Rep Id
-                        = D1
-                            ('MetaData "Id" "Ghci1" "interactive" 'True)
-                            (C1
-                              ('MetaCons "Id" 'PrefixI 'False)
-                              (S1
-                                  ('MetaSel
-                                    'Nothing 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                                  (Rec0 Int)))
-                      """
-                        |> format
-                            [ ( "Id", orange )
-                            , ( "Int", red )
-                            ]
-                    ]
+view : Example msg -> Html msg
+view example =
+    Html.section []
+        [ Html.h2 [] [ Html.text example.name ]
+        , Html.table []
+            [ Html.tr []
+                [ Html.th [] []
+                , Html.th [] [ Html.text "Original" ]
+                , Html.th [] [ Html.text "Generic representation" ]
                 ]
-            , Html.td [] [ Html.code [] [ Html.text "Id 5" ] ]
+            , Html.tr []
+                [ Html.th [] [ Html.text "Type" ]
+                , Html.td [] [ example.originalType |> format example.formatting ]
+                , Html.td [] [ example.genericsType |> format example.formatting ]
+                ]
+            , Html.tr []
+                [ Html.th [] [ Html.text "Example Value" ]
+                , Html.td [] [ example.originalValue |> format example.formatting ]
+                , Html.td [] [ example.genericsValue |> format example.formatting ]
+                ]
             ]
         ]
+
+
+type alias Example msg =
+    { name : String
+    , originalType : String
+    , originalValue : String
+    , genericsType : String
+    , genericsValue : String
+    , formatting : List ( String, String -> Html msg )
+    }
+
+
+examples : List (Example msg)
+examples =
+    [ { name = "newtype"
+      , originalType = "newtype Id = Id Int"
+      , originalValue = "Id 5"
+      , genericsType =
+            """
+        type instance Rep Id
+          = D1
+              ('MetaData "Id" "Ghci1" "interactive" 'True)
+              (C1
+                ('MetaCons "Id" 'PrefixI 'False)
+                (S1
+                    ('MetaSel
+                      'Nothing 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
+                    (Rec0 Int)))
+        """
+      , genericsValue = ""
+      , formatting =
+            [ ( "Id", orange )
+            , ( "Int", red )
+            ]
+      }
+    ]
 
 
 orange : String -> Html msg
