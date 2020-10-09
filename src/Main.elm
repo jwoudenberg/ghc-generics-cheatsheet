@@ -82,7 +82,7 @@ viewSummary example =
             , Css.fontSize (Css.em 2)
             , Css.lineHeight (Css.em 1)
             , Css.borderRadius (Css.px 2)
-            , Css.boxShadow4 (Css.px 0) (Css.px 0) (Css.px 2) (Css.hex "#333")
+            , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
             , Css.backgroundColor (Css.hex "#fff")
             ]
         ]
@@ -128,6 +128,8 @@ cellStyles =
         , Css.borderRadius (Css.px 2)
         , Css.padding (Css.px 20)
         , Css.fontSize (Css.em 1.1)
+        , Css.lineHeight (Css.em 0.9)
+        , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
         ]
 
 
@@ -135,7 +137,7 @@ headerStyles : Css.Style
 headerStyles =
     Css.batch
         [ Css.color (Css.hex "#fff")
-        , Css.textShadow4 (Css.px 0) (Css.px 0) (Css.px 2) (Css.hex "#000")
+        , Css.textShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#000")
         ]
 
 
@@ -227,7 +229,14 @@ examples =
                                 ('MetaSel ('Just "genre") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                                 (Rec0 Genre))))
             """
-      , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = \"Inis\"}} :*: (M1 {unM1 = K1 {unK1 = 4}} :*: M1 {unM1 = K1 {unK1 = Strategy}})}}"
+      , genericsValue =
+            """
+            M1 (
+              M1 (
+                M1 (K1 "Inis") :*: ( M1 (K1 4) :*: M1 (K1 Strategy) )
+              )
+            )
+            """
       , formatting = []
       }
     , { originalType = "data Unicorn"
