@@ -177,7 +177,8 @@ examples =
             """
       , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = 5}}}}"
       , formatting =
-            [ ( "Id", orange )
+            [ ( "MkId", blue )
+            , ( "Id", orange )
             , ( "Int", red )
             ]
       }
@@ -262,6 +263,16 @@ orange string =
         [ Html.text string ]
 
 
+blue : String -> Html msg
+blue string =
+    Html.span
+        [ Attr.css
+            [ Css.color (Css.hex "#2b74c1")
+            ]
+        ]
+        [ Html.text string ]
+
+
 red : String -> Html msg
 red string =
     Html.span
@@ -278,30 +289,25 @@ format replacements_ string =
         replacements =
             replacements_
                 |> List.map (\( key, modifier ) -> ( key, modifier key ))
-                |> Dict.fromList
     in
-    [ String.Extra.unindent string |> String.trim ]
-        |> breakUpAround (Dict.keys replacements)
-        |> List.map
-            (\fragment ->
-                Dict.get fragment replacements
-                    |> Maybe.withDefault (Html.text fragment)
-            )
+    String.Extra.unindent string
+        |> String.trim
+        |> replaceWithHtml replacements
         |> Html.code [ Attr.css [ Css.whiteSpace Css.pre ] ]
 
 
-breakUpAround : List String -> List String -> List String
-breakUpAround breakers fragments =
+replaceWithHtml : List ( String, Html msg ) -> String -> List (Html msg)
+replaceWithHtml breakers string =
     case breakers of
         [] ->
-            fragments
+            if String.isEmpty string then
+                []
 
-        breaker :: rest ->
-            fragments
-                |> List.concatMap
-                    (\fragment ->
-                        String.split breaker fragment
-                            |> List.intersperse breaker
-                            |> List.filter (not << String.isEmpty)
-                    )
-                |> breakUpAround rest
+            else
+                [ Html.text string ]
+
+        ( breaker, replacement ) :: rest ->
+            String.split breaker string
+                |> List.map (replaceWithHtml rest)
+                |> List.intersperse [ replacement ]
+                |> List.concatMap identity
