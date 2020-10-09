@@ -141,6 +141,18 @@ headerStyles =
         ]
 
 
+hoverStyles : Css.Style
+hoverStyles =
+    Css.batch
+        [ Css.cursor Css.pointer
+        , Css.borderRadius (Css.px 4)
+        , Css.hover
+            [ Css.backgroundColor (Css.hex "#eee")
+            , Css.boxShadow4 (Css.px 0) (Css.px 0) (Css.px 4) (Css.hex "#eee")
+            ]
+        ]
+
+
 type Model
     = IndexPage
     | ExamplePage Example
@@ -258,6 +270,7 @@ orange string =
     Html.span
         [ Attr.css
             [ Css.color (Css.hex "#ffa500")
+            , hoverStyles
             ]
         ]
         [ Html.text string ]
@@ -268,6 +281,7 @@ blue string =
     Html.span
         [ Attr.css
             [ Css.color (Css.hex "#2b74c1")
+            , hoverStyles
             ]
         ]
         [ Html.text string ]
@@ -278,6 +292,7 @@ red string =
     Html.span
         [ Attr.css
             [ Css.color (Css.hex "#ff0000")
+            , hoverStyles
             ]
         ]
         [ Html.text string ]
