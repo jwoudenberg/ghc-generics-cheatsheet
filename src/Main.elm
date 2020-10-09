@@ -54,20 +54,20 @@ type alias Example msg =
 examples : List (Example msg)
 examples =
     [ { originalType = "newtype Id = MkId Int"
-      , originalValue = "Id 5"
+      , originalValue = "MkId 5"
       , genericsType =
             """
             type instance Rep Id
               = D1
-                  ('MetaData "Id" "Ghci1" "interactive" 'True)
+                  ('MetaData "Id" "Ghci2" "interactive" 'True)
                   (C1
-                    ('MetaCons "Id" 'PrefixI 'False)
+                    ('MetaCons "MkId" 'PrefixI 'False)
                     (S1
                         ('MetaSel
                           'Nothing 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                         (Rec0 Int)))
             """
-      , genericsValue = ""
+      , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = 5}}}}"
       , formatting =
             [ ( "Id", orange )
             , ( "Int", red )
@@ -75,17 +75,25 @@ examples =
       }
     , { originalType = "data Weather = Sunny | Cloudy | Rainy"
       , originalValue = "Cloudy"
-      , genericsType = ""
-      , genericsValue = ""
+      , genericsType =
+            """
+            type instance Rep Weather
+              = D1
+                  ('MetaData "Weather" "Ghci3" "interactive" 'False)
+                  (C1 ('MetaCons "Sunny" 'PrefixI 'False) U1
+                  :+: (C1 ('MetaCons "Cloudy" 'PrefixI 'False) U1
+                        :+: C1 ('MetaCons "Rainy" 'PrefixI 'False) U1))
+            """
+      , genericsValue = "M1 {unM1 = R1 (L1 (M1 {unM1 = U1}))}"
       , formatting = []
       }
     , { originalType =
             """
             data BoardGame =
               BoardGame
-                { name : Text
-                , maxPlayers : Int
-                , genre : Genre
+                { name :: Text
+                , maxPlayers :: Int
+                , genre :: Genre
                 }
             """
       , originalValue =
@@ -93,16 +101,48 @@ examples =
             BoardGame
               { name = "Inis"
               , maxPlayers = 4
-              , theme = Strategy
+              , genre = Strategy
               }
             """
-      , genericsType = ""
-      , genericsValue = ""
+      , genericsType =
+            """
+            type instance Rep BoardGame
+              = D1
+                  ('MetaData "BoardGame" "Ghci8" "interactive" 'False)
+                  (C1
+                    ('MetaCons "BoardGame" 'PrefixI 'True)
+                    (S1
+                        ('MetaSel
+                          ('Just "name")
+                          'NoSourceUnpackedness
+                          'NoSourceStrictness
+                          'DecidedLazy)
+                        (Rec0 Text)
+                      :*: (S1
+                            ('MetaSel
+                                ('Just "maxPlayers")
+                                'NoSourceUnpackedness
+                                'NoSourceStrictness
+                                'DecidedLazy)
+                            (Rec0 Int)
+                          :*: S1
+                                ('MetaSel
+                                    ('Just "genre")
+                                    'NoSourceUnpackedness
+                                    'NoSourceStrictness
+                                    'DecidedLazy)
+                                (Rec0 Genre))))
+            """
+      , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = \"Inis\"}} :*: (M1 {unM1 = K1 {unK1 = 4}} :*: M1 {unM1 = K1 {unK1 = Strategy}})}}"
       , formatting = []
       }
     , { originalType = "data Unicorn"
       , originalValue = "n/a"
-      , genericsType = ""
+      , genericsType =
+            """
+            type instance Rep Unicorn
+              = D1 ('MetaData "Unicorn" "Ghci17" "interactive" 'False) V1
+            """
       , genericsValue = "n/a"
       , formatting = []
       }
