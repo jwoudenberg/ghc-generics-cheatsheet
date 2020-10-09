@@ -5,21 +5,97 @@ import Css
 import Dict exposing (Dict)
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
+import Html.Styled.Events as Events
 import List
 import String.Extra
 
 
-main : Program () () ()
+main : Program () Model Msg
 main =
     Browser.sandbox
-        { init = ()
-        , update = \_ _ -> ()
-        , view = \_ -> Html.toUnstyled <| Html.div [] (List.map view examples)
+        { init = IndexPage
+        , update = update
+        , view = Html.toUnstyled << view
         }
 
 
-view : Example msg -> Html msg
-view example =
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        OpenExample example ->
+            ExamplePage example
+
+
+view : Model -> Html Msg
+view model =
+    Html.div
+        [ Attr.css
+            [ Css.backgroundColor (Css.hex "#ee5185")
+            , Css.position Css.absolute
+            , Css.width (Css.vw 100)
+            , Css.height (Css.vh 100)
+            , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
+            ]
+        ]
+        [ viewPage model ]
+
+
+viewPage : Model -> Html Msg
+viewPage model =
+    case model of
+        IndexPage ->
+            Html.div
+                [ Attr.css
+                    [ Css.margin Css.auto
+                    , Css.width (Css.px 700)
+                    ]
+                ]
+                [ Html.h1
+                    [ Attr.css
+                        [ Css.marginTop (Css.em 1.2)
+                        , Css.marginBottom (Css.em 0.8)
+                        , Css.textAlign Css.center
+                        , Css.color (Css.hex "#fff")
+                        , Css.textShadow4 (Css.px 0) (Css.px 0) (Css.px 2) (Css.hex "#000")
+                        ]
+                    ]
+                    [ Html.text "GHC Generics Cheat Sheet" ]
+                , Html.ul
+                    [ Attr.css
+                        [ Css.listStyle Css.none
+                        , Css.margin Css.zero
+                        , Css.padding Css.zero
+                        ]
+                    ]
+                    (List.map viewSummary examples)
+                ]
+
+        ExamplePage example ->
+            viewExample example
+
+
+viewSummary : Example -> Html Msg
+viewSummary example =
+    Html.li
+        [ Attr.css
+            [ Css.padding (Css.px 10)
+            , Css.marginBottom (Css.px 20)
+            , Css.fontSize (Css.em 2)
+            , Css.lineHeight (Css.em 1)
+            , Css.borderRadius (Css.px 2)
+            , Css.boxShadow4 (Css.px 0) (Css.px 0) (Css.px 2) (Css.hex "#333")
+            , Css.backgroundColor (Css.hex "#fff")
+            ]
+        ]
+        [ Html.a
+            [ Events.onClick (OpenExample example) ]
+            [ example.originalType |> format example.formatting
+            ]
+        ]
+
+
+viewExample : Example -> Html Msg
+viewExample example =
     Html.section []
         [ Html.h2 [] [ Html.text example.originalType ]
         , Html.table []
@@ -42,16 +118,25 @@ view example =
         ]
 
 
-type alias Example msg =
+type Model
+    = IndexPage
+    | ExamplePage Example
+
+
+type Msg
+    = OpenExample Example
+
+
+type alias Example =
     { originalType : String
     , originalValue : String
     , genericsType : String
     , genericsValue : String
-    , formatting : List ( String, String -> Html msg )
+    , formatting : List ( String, String -> Html Msg )
     }
 
 
-examples : List (Example msg)
+examples : List Example
 examples =
     [ { originalType = "newtype Id = MkId Int"
       , originalValue = "MkId 5"
@@ -177,7 +262,8 @@ format replacements_ string =
                 |> List.map (\( key, modifier ) -> ( key, modifier key ))
                 |> Dict.fromList
     in
-    breakUpAround (Dict.keys replacements) [ String.Extra.unindent string ]
+    [ String.Extra.unindent string |> String.trim ]
+        |> breakUpAround (Dict.keys replacements)
         |> List.map
             (\fragment ->
                 Dict.get fragment replacements
