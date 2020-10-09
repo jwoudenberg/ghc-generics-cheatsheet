@@ -32,8 +32,8 @@ view model =
         [ Attr.css
             [ Css.backgroundColor (Css.hex "#ee5185")
             , Css.position Css.absolute
-            , Css.width (Css.vw 100)
-            , Css.height (Css.vh 100)
+            , Css.minWidth (Css.vw 100)
+            , Css.minHeight (Css.vh 100)
             , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
             ]
         ]
@@ -55,8 +55,7 @@ viewPage model =
                         [ Css.marginTop (Css.em 1.2)
                         , Css.marginBottom (Css.em 0.8)
                         , Css.textAlign Css.center
-                        , Css.color (Css.hex "#fff")
-                        , Css.textShadow4 (Css.px 0) (Css.px 0) (Css.px 2) (Css.hex "#000")
+                        , headerStyles
                         ]
                     ]
                     [ Html.text "GHC Generics Cheat Sheet" ]
@@ -96,25 +95,47 @@ viewSummary example =
 
 viewExample : Example -> Html Msg
 viewExample example =
-    Html.section []
-        [ Html.h2 [] [ Html.text example.originalType ]
-        , Html.table []
-            [ Html.tr []
-                [ Html.th [] []
-                , Html.th [] [ Html.text "Original" ]
-                , Html.th [] [ Html.text "Generic representation" ]
-                ]
-            , Html.tr []
-                [ Html.th [] [ Html.text "Type" ]
-                , Html.td [] [ example.originalType |> format example.formatting ]
-                , Html.td [] [ example.genericsType |> format example.formatting ]
-                ]
-            , Html.tr []
-                [ Html.th [] [ Html.text "Example Value" ]
-                , Html.td [] [ example.originalValue |> format example.formatting ]
-                , Html.td [] [ example.genericsValue |> format example.formatting ]
-                ]
+    Html.table
+        [ Attr.css
+            [ Css.minWidth (Css.vw 100)
+            , Css.minHeight (Css.vh 100)
+            , Css.borderCollapse Css.separate
+            , Css.borderSpacing (Css.px 20)
             ]
+        ]
+        [ Html.tr []
+            [ Html.th [] []
+            , Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Original" ]
+            , Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Generic representation" ]
+            ]
+        , Html.tr []
+            [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Type" ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalType |> format example.formatting ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsType |> format example.formatting ]
+            ]
+        , Html.tr []
+            [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Example Value" ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalValue |> format example.formatting ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsValue |> format example.formatting ]
+            ]
+        ]
+
+
+cellStyles : Css.Style
+cellStyles =
+    Css.batch
+        [ Css.backgroundColor (Css.hex "#fefefe")
+        , Css.borderRadius (Css.px 2)
+        , Css.padding (Css.px 20)
+        , Css.fontSize (Css.em 1.1)
+        ]
+
+
+headerStyles : Css.Style
+headerStyles =
+    Css.batch
+        [ Css.color (Css.hex "#fff")
+        , Css.textShadow4 (Css.px 0) (Css.px 0) (Css.px 2) (Css.hex "#000")
         ]
 
 
@@ -197,25 +218,13 @@ examples =
                   (C1
                     ('MetaCons "BoardGame" 'PrefixI 'True)
                     (S1
-                        ('MetaSel
-                          ('Just "name")
-                          'NoSourceUnpackedness
-                          'NoSourceStrictness
-                          'DecidedLazy)
+                        ('MetaSel ('Just "name") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                         (Rec0 Text)
                       :*: (S1
-                            ('MetaSel
-                                ('Just "maxPlayers")
-                                'NoSourceUnpackedness
-                                'NoSourceStrictness
-                                'DecidedLazy)
+                            ('MetaSel ('Just "maxPlayers") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                             (Rec0 Int)
                           :*: S1
-                                ('MetaSel
-                                    ('Just "genre")
-                                    'NoSourceUnpackedness
-                                    'NoSourceStrictness
-                                    'DecidedLazy)
+                                ('MetaSel ('Just "genre") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                                 (Rec0 Genre))))
             """
       , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = \"Inis\"}} :*: (M1 {unM1 = K1 {unK1 = 4}} :*: M1 {unM1 = K1 {unK1 = Strategy}})}}"
