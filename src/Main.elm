@@ -21,7 +21,7 @@ main =
 view : Example msg -> Html msg
 view example =
     Html.section []
-        [ Html.h2 [] [ Html.text example.name ]
+        [ Html.h2 [] [ Html.text example.originalType ]
         , Html.table []
             [ Html.tr []
                 [ Html.th [] []
@@ -43,8 +43,7 @@ view example =
 
 
 type alias Example msg =
-    { name : String
-    , originalType : String
+    { originalType : String
     , originalValue : String
     , genericsType : String
     , genericsValue : String
@@ -54,8 +53,7 @@ type alias Example msg =
 
 examples : List (Example msg)
 examples =
-    [ { name = "newtype"
-      , originalType = "newtype Id = Id Int"
+    [ { originalType = "newtype Id = MkId Int"
       , originalValue = "Id 5"
       , genericsType =
             """
@@ -75,15 +73,13 @@ examples =
             , ( "Int", red )
             ]
       }
-    , { name = "multiple constructors"
-      , originalType = "data Weather = Sunny | Cloudy | Rainy"
+    , { originalType = "data Weather = Sunny | Cloudy | Rainy"
       , originalValue = "Cloudy"
       , genericsType = ""
       , genericsValue = ""
       , formatting = []
       }
-    , { name = "record"
-      , originalType =
+    , { originalType =
             """
             data BoardGame =
               BoardGame
@@ -104,8 +100,7 @@ examples =
       , genericsValue = ""
       , formatting = []
       }
-    , { name = "no constuctors"
-      , originalType = "data Unicorn"
+    , { originalType = "data Unicorn"
       , originalValue = "n/a"
       , genericsType = ""
       , genericsValue = "n/a"
