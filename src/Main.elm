@@ -59,21 +59,57 @@ examples =
       , originalValue = "Id 5"
       , genericsType =
             """
-        type instance Rep Id
-          = D1
-              ('MetaData "Id" "Ghci1" "interactive" 'True)
-              (C1
-                ('MetaCons "Id" 'PrefixI 'False)
-                (S1
-                    ('MetaSel
-                      'Nothing 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                    (Rec0 Int)))
-        """
+            type instance Rep Id
+              = D1
+                  ('MetaData "Id" "Ghci1" "interactive" 'True)
+                  (C1
+                    ('MetaCons "Id" 'PrefixI 'False)
+                    (S1
+                        ('MetaSel
+                          'Nothing 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
+                        (Rec0 Int)))
+            """
       , genericsValue = ""
       , formatting =
             [ ( "Id", orange )
             , ( "Int", red )
             ]
+      }
+    , { name = "multiple constructors"
+      , originalType = "data Weather = Sunny | Cloudy | Rainy"
+      , originalValue = "Cloudy"
+      , genericsType = ""
+      , genericsValue = ""
+      , formatting = []
+      }
+    , { name = "record"
+      , originalType =
+            """
+            data BoardGame =
+              BoardGame
+                { name : Text
+                , maxPlayers : Int
+                , genre : Genre
+                }
+            """
+      , originalValue =
+            """
+            BoardGame
+              { name = "Inis"
+              , maxPlayers = 4
+              , theme = Strategy
+              }
+            """
+      , genericsType = ""
+      , genericsValue = ""
+      , formatting = []
+      }
+    , { name = "no constuctors"
+      , originalType = "data Unicorn"
+      , originalValue = "n/a"
+      , genericsType = ""
+      , genericsValue = "n/a"
+      , formatting = []
       }
     ]
 
