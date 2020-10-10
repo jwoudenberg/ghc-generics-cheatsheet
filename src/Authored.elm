@@ -1,4 +1,4 @@
-module Authored exposing (Example, examples)
+module Authored exposing (Annotation, Example, examples)
 
 
 type alias Example =
@@ -7,7 +7,13 @@ type alias Example =
     , originalValue : String
     , genericsType : String
     , genericsValue : String
-    , annotations : List ( String, String )
+    , annotations : List Annotation
+    }
+
+
+type alias Annotation =
+    { keyword : String
+    , annotation : String
     }
 
 
@@ -30,9 +36,15 @@ examples =
             """
       , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = 5}}}}"
       , annotations =
-            [ ( "MkId", "Constructor" )
-            , ( "Id", "Type name" )
-            , ( "Int", "Wrapped type" )
+            [ { keyword = "MkId"
+              , annotation = "Constructor"
+              }
+            , { keyword = "Id"
+              , annotation = "Type name"
+              }
+            , { keyword = "Int"
+              , annotation = "Wrapped type"
+              }
             ]
       }
     , { path = "weather"

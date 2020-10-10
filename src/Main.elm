@@ -12,7 +12,7 @@ import List
 import String.Extra
 import Url exposing (Url)
 import Url.Builder
-import Url.Parser
+import Url.Parser exposing ((</>))
 
 
 main : Program () Model Msg
@@ -81,13 +81,22 @@ update msg model =
 parseUrl : Url -> Page
 parseUrl url =
     let
-        exampleParser example =
-            Url.Parser.map (ExamplePage example) (Url.Parser.s example.path)
-
         parser =
             Url.Parser.oneOf <|
                 Url.Parser.map IndexPage Url.Parser.top
                     :: List.map exampleParser Authored.examples
+
+        exampleParser example =
+            Url.Parser.s example.path
+                </> (Url.Parser.oneOf <|
+                        Url.Parser.map (ExamplePage example) Url.Parser.top
+                            :: List.map (annotationParser example) example.annotations
+                    )
+
+        annotationParser example annotation =
+            Url.Parser.map
+                (AnnotationPage example annotation)
+                (Url.Parser.s (String.toLower annotation.keyword))
     in
     Url.Parser.parse parser url
         |> Maybe.withDefault IndexPage
@@ -95,12 +104,19 @@ parseUrl url =
 
 urlForPage : Page -> String
 urlForPage page =
-    case page of
-        IndexPage ->
-            "/"
+    let
+        segments =
+            case page of
+                IndexPage ->
+                    []
 
-        ExamplePage example ->
-            "/" ++ Url.Builder.relative [ example.path ] []
+                ExamplePage example ->
+                    [ example.path ]
+
+                AnnotationPage example annotation ->
+                    [ example.path, String.toLower annotation.keyword ]
+    in
+    "/" ++ Url.Builder.relative segments []
 
 
 view : Page -> Html Msg
@@ -149,6 +165,9 @@ viewPage page =
         ExamplePage example ->
             viewExample example
 
+        AnnotationPage example annotation ->
+            Html.text annotation.annotation
+
 
 viewSummary : Authored.Example -> Html Msg
 viewSummary example =
@@ -171,7 +190,7 @@ viewSummary example =
                 , Css.padding (Css.px 10)
                 ]
             ]
-            [ example.originalType |> annotate example.annotations
+            [ viewExampleText .originalType example
             ]
         ]
 
@@ -206,13 +225,13 @@ viewExample example =
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Type" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalType |> annotate example.annotations ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsType |> annotate example.annotations ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .originalType example ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .genericsType example ]
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Example Value" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalValue |> annotate example.annotations ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsValue |> annotate example.annotations ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .originalValue example ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .genericsValue example ]
             ]
         ]
 
@@ -258,6 +277,7 @@ type alias Model =
 type Page
     = IndexPage
     | ExamplePage Authored.Example
+    | AnnotationPage Authored.Example Authored.Annotation
 
 
 type Msg
@@ -265,30 +285,33 @@ type Msg
     | NavigatedTo Url
 
 
-annotate : List ( String, a ) -> String -> Html msg
-annotate replacements_ string =
+viewExampleText : (Authored.Example -> String) -> Authored.Example -> Html msg
+viewExampleText getString example =
     let
         colors =
             colorscheme
-                ++ List.repeat (List.length replacements_) (Css.batch [])
+                ++ List.repeat (List.length example.annotations) (Css.batch [])
 
         replacements =
             List.map2
-                (\( key, _ ) color -> ( key, formatFragment key color ))
-                replacements_
+                (\annotation color -> ( annotation.keyword, formatKeyword annotation color ))
+                example.annotations
                 colors
 
-        formatFragment : String -> Css.Style -> Html msg
-        formatFragment key color =
-            Html.span
-                [ Attr.css
-                    [ color
+        formatKeyword : Authored.Annotation -> Css.Style -> Html msg
+        formatKeyword annotation color =
+            Html.a
+                [ Attr.href (urlForPage (AnnotationPage example annotation))
+                , Attr.css
+                    [ Css.color Css.inherit
+                    , Css.textDecoration Css.none
+                    , color
                     , hoverStyles
                     ]
                 ]
-                [ Html.text key ]
+                [ Html.text annotation.keyword ]
     in
-    String.Extra.unindent string
+    String.Extra.unindent (getString example)
         |> String.trim
         |> replaceWithHtml replacements
         |> Html.code [ Attr.css [ Css.whiteSpace Css.pre ] ]
