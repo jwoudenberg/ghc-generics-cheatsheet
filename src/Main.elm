@@ -172,7 +172,6 @@ viewExample example =
     Html.table
         [ Attr.css
             [ Css.minWidth (Css.vw 100)
-            , Css.minHeight (Css.vh 100)
             , Css.borderCollapse Css.separate
             , Css.borderSpacing (Css.px 20)
             ]
