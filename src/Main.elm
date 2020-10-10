@@ -21,9 +21,9 @@ main =
             \_ url key ->
                 navigateTo
                     url
+                    False
                     { page = IndexPage
                     , key = key
-                    , currentPath = "/initial-load"
                     }
         , update = update
         , view =
@@ -33,7 +33,7 @@ main =
                 }
         , subscriptions = \_ -> Sub.none
         , onUrlRequest = NavigateTo
-        , onUrlChange = NavigateTo << Browser.Internal
+        , onUrlChange = NavigatedTo
         }
 
 
@@ -46,11 +46,14 @@ update msg model =
             )
 
         NavigateTo (Browser.Internal url) ->
-            navigateTo url model
+            navigateTo url True model
+
+        NavigatedTo url ->
+            navigateTo url False model
 
 
-navigateTo : Url -> Model -> ( Model, Cmd Msg )
-navigateTo url model =
+navigateTo : Url -> Bool -> Model -> ( Model, Cmd Msg )
+navigateTo url push model =
     let
         parser =
             Url.Parser.oneOf <|
@@ -69,12 +72,11 @@ navigateTo url model =
     in
     ( { page = newPage
       , key = model.key
-      , currentPath = url.path
       }
-    , if url.path == urlForPage newPage then
+    , if url.path == urlForPage model.page then
         Cmd.none
 
-      else if newUrl /= urlForPage model.page then
+      else if push then
         Browser.Navigation.pushUrl model.key newUrl
 
       else
@@ -242,7 +244,6 @@ hoverStyles =
 type alias Model =
     { page : Page
     , key : Key
-    , currentPath : String
     }
 
 
@@ -253,6 +254,7 @@ type Page
 
 type Msg
     = NavigateTo Browser.UrlRequest
+    | NavigatedTo Url
 
 
 type alias Example =
