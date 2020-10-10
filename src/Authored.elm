@@ -219,11 +219,11 @@ metadataAnnotation =
         `'MetaData` gets this prime because it is defined in a peculiar way.
         We usually define types using the keywords `type`, `newtype`, and `data`, but there's another way:
         If we enable the `DataKinds` extension in a module GHC will create a type for each constructor in the module, with the same name as the constructor.
+        That's why in the [documentation for `'MetaData`][metadata] we see it defined as a constructor of the `Meta` type.
 
         `DataKinds` will give us a type and a constructor with the same name.
         When we put a prime in front of the name we tell GHC we mean the type, not the constructor.
-        In most uses GHC is able to figure out whether we mean the type or constructor and we can omit the prime.
-        That's why in the [documentation for `'MetaData`][metadata] we see it defined as a constructor of the `Meta` type.
+        In most cases GHC is able to figure out from context whether we mean the type or constructor and we can omit the prime.
 
         These automatically generated types `DataKinds` produces don't have any values
         so their only real use is in phantom types, which is exactly how `'MetaData'` is used!

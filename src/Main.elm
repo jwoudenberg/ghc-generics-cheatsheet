@@ -155,7 +155,17 @@ view page =
                     ]
                 , Attr.href "https://github.com/jwoudenberg/ghc-generics-cheatsheet"
                 ]
-                [ Html.text "Code on Github" ]
+                [ Html.text "This Code"
+                ]
+            , Html.text " - "
+            , Html.a
+                [ Attr.css
+                    [ Css.color Css.inherit
+                    ]
+                , Attr.href "https://dev.to/jwoudenberg"
+                ]
+                [ Html.text "My Blog"
+                ]
             ]
         ]
 
@@ -214,37 +224,44 @@ viewPage page =
                 , Html.div
                     [ Attr.css
                         [ Css.width (Css.px 700)
-                        , Css.margin2 Css.zero Css.auto
+                        , Css.backgroundColor (Css.hex "#fff")
+                        , Css.padding (Css.px 10)
+                        , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
+                        , Css.borderRadius (Css.px 2)
+                        , Css.margin2 (Css.px 10) Css.auto
                         , Css.Global.descendants
                             [ Css.Global.typeSelector "h1"
-                                [ headerStyles
+                                [ Css.marginTop (Css.px 10)
+                                , Css.color (Css.hex "#333")
                                 ]
                             , Css.Global.typeSelector "p"
                                 [ Css.fontSize (Css.em 1.1)
-                                , Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.3)
                                 ]
                             , Css.Global.typeSelector "a"
                                 [ Css.color Css.inherit
+                                , Css.color (Css.hex "#ee5185")
+                                , Css.textDecoration Css.none
                                 ]
                             , Css.Global.typeSelector "code"
                                 [ Css.fontSize (Css.em 1.1)
                                 ]
                             , Css.Global.typeSelector "pre"
-                                [ Css.backgroundColor (Css.hex "#fff")
-                                , Css.lineHeight (Css.em 1)
+                                [ Css.backgroundColor (Css.hex "#333")
+                                , Css.color (Css.hex "#fff")
+                                , Css.lineHeight (Css.em 1.4)
                                 , Css.display Css.block
-                                , Css.padding (Css.px 10)
-                                , Css.borderRadius (Css.px 2)
-                                , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
+                                , Css.padding2 (Css.px 10) (Css.px 20)
+                                , Css.margin2 Css.zero (Css.px -10)
                                 ]
                             , Css.Global.typeSelector "table"
-                                [ Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.3)
+                                [ Css.margin (Css.px 10)
                                 ]
                             , Css.Global.typeSelector "td"
                                 [ Css.paddingRight (Css.em 2)
                                 ]
                             , Css.Global.typeSelector "th"
                                 [ Css.paddingRight (Css.em 2)
+                                , Css.textAlign Css.left
                                 ]
                             ]
                         ]
@@ -436,3 +453,4 @@ toParam : String -> String
 toParam str =
     String.toLower str
         |> String.replace " " "-"
+        |> String.replace "'" ""

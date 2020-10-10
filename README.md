@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/cb73043f-4af3-4a65-82e5-efb2fb70ffad/deploy-status)](https://app.netlify.com/sites/ghc-generics/deploys)
+
 # GHC Generics Cheatsheet
 
 Generics allow us to write Haskell code that can work with any type. An example is the `aeson` library, which is able to automatically create JSON encoders and decoders for (almost) all Haskell types. How do they do it?
