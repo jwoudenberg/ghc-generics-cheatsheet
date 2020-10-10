@@ -77,7 +77,7 @@ examples =
       , originalType =
             """
             data BoardGame =
-              BoardGame
+              Stats
                 { name :: Text
                 , maxPlayers :: Int
                 , genre :: Genre
@@ -85,7 +85,7 @@ examples =
             """
       , originalValue =
             """
-            BoardGame
+            Stats
               { name = "Inis"
               , maxPlayers = 4
               , genre = Strategy
@@ -97,7 +97,7 @@ examples =
               = M1 D
                    ('MetaData "BoardGame" "Ghci8" "interactive" 'False)
                    (M1 C
-                       ('MetaCons "BoardGame" 'PrefixI 'True)
+                       ('MetaCons "Stats" 'PrefixI 'True)
                        (M1 S
                            ('MetaSel ('Just "name") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                            (Rec0 Text)
