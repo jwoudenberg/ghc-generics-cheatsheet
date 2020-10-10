@@ -443,3 +443,4 @@ toParam : String -> String
 toParam str =
     String.toLower str
         |> String.replace " " "-"
+        |> String.replace "'" ""
