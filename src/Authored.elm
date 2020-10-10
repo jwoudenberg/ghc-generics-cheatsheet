@@ -59,11 +59,13 @@ examples =
       , genericsType =
             """
             type instance Rep Weather
-              = D1
-                  ('MetaData "Weather" "Ghci3" "interactive" 'False)
-                  (C1 ('MetaCons "Sunny" 'PrefixI 'False) U1
-                  :+: (C1 ('MetaCons "Cloudy" 'PrefixI 'False) U1
-                        :+: C1 ('MetaCons "Rainy" 'PrefixI 'False) U1))
+              = M1 D
+                   ('MetaData "Weather" "Ghci3" "interactive" 'False)
+                   (M1 C ('MetaCons "Sunny" 'PrefixI 'False) U1
+                    :+:
+                    (M1 C ('MetaCons "Cloudy" 'PrefixI 'False) U1
+                     :+:
+                     M1 C ('MetaCons "Rainy" 'PrefixI 'False) U1))
             """
       , genericsValue = "M1 (R1 (L1 (M1 U1)))"
       , annotations =
@@ -92,19 +94,21 @@ examples =
       , genericsType =
             """
             type instance Rep BoardGame
-              = D1
-                  ('MetaData "BoardGame" "Ghci8" "interactive" 'False)
-                  (C1
-                    ('MetaCons "BoardGame" 'PrefixI 'True)
-                    (S1
-                        ('MetaSel ('Just "name") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                        (Rec0 Text)
-                      :*: (S1
+              = M1 D
+                   ('MetaData "BoardGame" "Ghci8" "interactive" 'False)
+                   (M1 C
+                       ('MetaCons "BoardGame" 'PrefixI 'True)
+                       (M1 S
+                           ('MetaSel ('Just "name") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
+                           (Rec0 Text)
+                        :*:
+                        (M1 S
                             ('MetaSel ('Just "maxPlayers") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                             (Rec0 Int)
-                          :*: S1
-                                ('MetaSel ('Just "genre") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                                (Rec0 Genre))))
+                         :*:
+                         M1 S
+                            ('MetaSel ('Just "genre") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
+                            (Rec0 Genre))))
             """
       , genericsValue =
             """
@@ -125,7 +129,9 @@ examples =
       , genericsType =
             """
             type instance Rep Unicorn
-              = D1 ('MetaData "Unicorn" "Ghci17" "interactive" 'False) V1
+              = M1 D
+                   ('MetaData "Unicorn" "Ghci17" "interactive" 'False)
+                   V1
             """
       , genericsValue = "n/a"
       , annotations =
