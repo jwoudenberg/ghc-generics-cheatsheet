@@ -128,9 +128,30 @@ view page =
             , Css.minWidth (Css.vw 100)
             , Css.minHeight (Css.vh 100)
             , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
+            , Css.displayFlex
+            , Css.flexDirection Css.column
+            , Css.justifyContent Css.spaceBetween
             ]
         ]
-        [ viewPage page ]
+        [ viewPage page
+        , Html.footer
+            [ Attr.css
+                [ Css.textAlign Css.center
+                , Css.opacity (Css.num 0.4)
+                , Css.padding (Css.px 10)
+                ]
+            ]
+            [ Html.text "© 2020 Jasper Woudenberg"
+            , Html.a
+                [ Attr.css
+                    [ Css.marginLeft (Css.px 60)
+                    , Css.color Css.inherit
+                    ]
+                , Attr.href "https://github.com/jwoudenberg/ghc-generics-cheatsheet"
+                ]
+                [ Html.text "Code on Github" ]
+            ]
+        ]
 
 
 viewPage : Page -> Html Msg
@@ -139,7 +160,7 @@ viewPage page =
         IndexPage ->
             Html.div
                 [ Attr.css
-                    [ Css.margin Css.auto
+                    [ Css.margin2 Css.zero Css.auto
                     , Css.width (Css.px 700)
                     ]
                 ]
