@@ -99,7 +99,7 @@ parseUrl url =
         annotationParser example annotation =
             Url.Parser.map
                 (AnnotationPage example annotation)
-                (Url.Parser.s (String.toLower annotation.keyword))
+                (Url.Parser.s (toParam annotation.keyword))
     in
     Url.Parser.parse parser url
         |> Maybe.withDefault IndexPage
@@ -117,7 +117,7 @@ urlForPage page =
                     [ example.path ]
 
                 AnnotationPage example annotation ->
-                    [ example.path, String.toLower annotation.keyword ]
+                    [ example.path, toParam annotation.keyword ]
     in
     "/" ++ Url.Builder.relative segments []
 
@@ -430,3 +430,9 @@ replaceWithHtml breakers string =
                 |> List.map (replaceWithHtml rest)
                 |> List.intersperse [ replacement ]
                 |> List.concatMap identity
+
+
+toParam : String -> String
+toParam str =
+    String.toLower str
+        |> String.replace " " "-"
