@@ -312,8 +312,10 @@ viewBackArrow page =
         , Attr.css
             [ headerStyles
             , Css.position Css.absolute
-            , Css.left (Css.px 30)
+            , Css.left Css.zero
             , Css.top Css.zero
+            , Css.lineHeight Css.zero
+            , Css.padding (Css.px 30)
             , Css.fontSize (Css.em 4)
             , Css.textDecoration Css.none
             , Css.display Css.block
@@ -340,18 +342,6 @@ headerStyles =
     Css.batch
         [ Css.color (Css.hex "#fff")
         , Css.textShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#000")
-        ]
-
-
-hoverStyles : Css.Style
-hoverStyles =
-    Css.batch
-        [ Css.cursor Css.pointer
-        , Css.borderRadius (Css.px 4)
-        , Css.hover
-            [ Css.backgroundColor (Css.hex "#eee")
-            , Css.boxShadow4 (Css.px 0) (Css.px 0) (Css.px 4) (Css.hex "#eee")
-            ]
         ]
 
 
@@ -387,16 +377,27 @@ viewExampleText getString example =
 
         formatKeyword : Authored.Annotation -> Css.Style -> Html msg
         formatKeyword annotation color =
-            Html.a
-                [ Attr.href (urlForPage (AnnotationPage example annotation))
-                , Attr.css
-                    [ Css.color Css.inherit
-                    , Css.textDecoration Css.none
-                    , color
-                    , hoverStyles
-                    ]
+            Html.span
+                [ Attr.css [ Css.display Css.inlineBlock ]
                 ]
-                [ Html.text annotation.keyword ]
+                [ Html.a
+                    [ Attr.href (urlForPage (AnnotationPage example annotation))
+                    , Attr.css
+                        [ Css.color Css.inherit
+                        , Css.textDecoration Css.none
+                        , color
+                        , Css.cursor Css.pointer
+                        , Css.borderRadius (Css.px 4)
+                        , Css.display Css.block
+                        , Css.padding (Css.px 15)
+                        , Css.margin (Css.px -15)
+                        , Css.hover
+                            [ Css.textDecoration Css.underline
+                            ]
+                        ]
+                    ]
+                    [ Html.text annotation.keyword ]
+                ]
     in
     String.Extra.unindent (getString example)
         |> String.trim
