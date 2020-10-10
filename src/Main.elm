@@ -4,11 +4,13 @@ import Authored
 import Browser
 import Browser.Navigation exposing (Key)
 import Css
+import Css.Global
 import Dict exposing (Dict)
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
 import List
+import Markdown
 import String.Extra
 import Url exposing (Url)
 import Url.Builder
@@ -187,7 +189,41 @@ viewPage page =
             viewExample example
 
         AnnotationPage example annotation ->
-            Html.text annotation.annotation
+            let
+                markdown =
+                    annotation.annotation
+                        |> String.Extra.unindent
+                        |> String.trim
+                        |> Markdown.toHtml []
+                        |> Html.fromUnstyled
+            in
+            Html.div
+                [ Attr.css
+                    [ Css.width (Css.px 700)
+                    , Css.margin2 Css.zero Css.auto
+                    , Css.Global.descendants
+                        [ Css.Global.typeSelector "h1"
+                            [ headerStyles
+                            ]
+                        , Css.Global.typeSelector "p"
+                            [ Css.opacity (Css.num 0.8)
+                            , Css.fontSize (Css.em 1.1)
+                            ]
+                        , Css.Global.typeSelector "code"
+                            [ Css.backgroundColor (Css.hex "#fff")
+                            , Css.fontSize (Css.em 1.1)
+                            , Css.lineHeight (Css.em 1)
+                            , Css.display Css.block
+                            , Css.padding (Css.px 10)
+                            , Css.borderRadius (Css.px 2)
+                            , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
+                            ]
+                        ]
+                    ]
+                ]
+                [ viewBackArrow (ExamplePage example)
+                , markdown
+                ]
 
 
 viewSummary : Authored.Example -> Html Msg
@@ -225,20 +261,7 @@ viewExample example =
             , Css.borderSpacing (Css.px 20)
             ]
         ]
-        [ Html.a
-            [ Attr.href (urlForPage IndexPage)
-            , Attr.css
-                [ headerStyles
-                , Css.position Css.absolute
-                , Css.left (Css.px 30)
-                , Css.top Css.zero
-                , Css.fontSize (Css.em 4)
-                , Css.textDecoration Css.none
-                , Css.display Css.block
-                ]
-            ]
-            [ Html.text "‹"
-            ]
+        [ viewBackArrow IndexPage
         , Html.tr []
             [ Html.th [] []
             , Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Original" ]
@@ -254,6 +277,24 @@ viewExample example =
             , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .originalValue example ]
             , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .genericsValue example ]
             ]
+        ]
+
+
+viewBackArrow : Page -> Html Msg
+viewBackArrow page =
+    Html.a
+        [ Attr.href (urlForPage page)
+        , Attr.css
+            [ headerStyles
+            , Css.position Css.absolute
+            , Css.left (Css.px 30)
+            , Css.top Css.zero
+            , Css.fontSize (Css.em 4)
+            , Css.textDecoration Css.none
+            , Css.display Css.block
+            ]
+        ]
+        [ Html.text "‹"
         ]
 
 

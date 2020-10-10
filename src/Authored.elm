@@ -37,7 +37,16 @@ examples =
       , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = 5}}}}"
       , annotations =
             [ { keyword = "MkId"
-              , annotation = "Constructor"
+              , annotation =
+                    """
+                    # Constructor name
+
+                    The constructor name is provided as metadata in the generics representation.
+
+                    ```hs
+                    newtype Id = MkId Int
+                    ```
+                    """
               }
             , { keyword = "Id"
               , annotation = "Type name"
