@@ -50,12 +50,7 @@ examples =
                     ```
                     """
               }
-            , { keyword = "Id"
-              , annotation = "Type name"
-              }
-            , { keyword = "Int"
-              , annotation = "Wrapped type"
-              }
+            , typeNameAnnotation "Id"
             ]
       }
     , { path = "weather"
@@ -71,7 +66,10 @@ examples =
                         :+: C1 ('MetaCons "Rainy" 'PrefixI 'False) U1))
             """
       , genericsValue = "M1 (R1 (L1 (M1 U1)))"
-      , annotations = [ m1Annotation ]
+      , annotations =
+            [ m1Annotation
+            , typeNameAnnotation "Weather"
+            ]
       }
     , { path = "boardgame"
       , originalType =
@@ -116,7 +114,10 @@ examples =
               )
             )
             """
-      , annotations = [ m1Annotation ]
+      , annotations =
+            [ m1Annotation
+            , typeNameAnnotation "BoardGame"
+            ]
       }
     , { path = "unicorn"
       , originalType = "data Unicorn"
@@ -127,7 +128,10 @@ examples =
               = D1 ('MetaData "Unicorn" "Ghci17" "interactive" 'False) V1
             """
       , genericsValue = "n/a"
-      , annotations = [ m1Annotation ]
+      , annotations =
+            [ m1Annotation
+            , typeNameAnnotation "Unicorn"
+            ]
       }
     ]
 
@@ -168,5 +172,56 @@ m1Annotation =
         type C1 = M1 C
         type S1 = M1 S
         ```
+        """
+    }
+
+
+typeNameAnnotation : String -> Annotation
+typeNameAnnotation keyword =
+    { keyword = keyword
+    , annotation =
+        """
+        # Type Name
+        
+        The name of the type is available as a type-level string on the metadata `M1` wrapping the type.
+
+        We can get type name as a regular string using the [`symbolVal`][symbolval] function in GHC's standard library.
+        In the example below we use it to define a function that can get the name of any type with a `Generic` instance.
+
+        ```haskell
+        {-# LANGUAGE DataKinds #-}
+        {-# LANGUAGE DeriveGeneric #-}
+        {-# LANGUAGE FlexibleContexts #-}
+        {-# LANGUAGE FlexibleInstances #-}
+        {-# LANGUAGE ScopedTypeVariables #-}
+
+        module Example (main) where
+
+        import Data.Proxy (Proxy (Proxy))
+        import GHC.Generics (D, Generic, M1, Meta (MetaData), Rep, from)
+        import GHC.TypeLits (KnownSymbol, symbolVal)
+
+        -- | Return the name of any type with a `Generic` instance.
+        typeName :: (Generic a, GetTypeName (Rep a)) => a -> String
+        typeName val = getTypeName (from val)
+
+        class GetTypeName f where
+          getTypeName :: f p -> String
+
+        instance (KnownSymbol typename) =>
+                GetTypeName (M1 D ('MetaData typename m p n) f) where
+          getTypeName _ = symbolVal (Proxy :: Proxy typename)
+
+        -- Okay, let's try this out!
+
+        data ExampleType = ExampleValue deriving (Generic)
+
+        main :: IO ()
+        main = putStrLn (typeName ExampleValue) -- -> "ExampleType"
+        ```
+
+        You can run this example yourself by copying it into a file called `Example.hs`, then running `runghc Example.hs`.
+
+        [symbolval]: https://www.stackage.org/haddock/lts-16.17/base-4.13.0.0/GHC-TypeLits.html#v:symbolVal
         """
     }
