@@ -170,7 +170,7 @@ viewSummary example =
                 , Css.padding (Css.px 10)
                 ]
             ]
-            [ example.originalType |> format example.formatting
+            [ example.originalType |> annotate example.annotations
             ]
         ]
 
@@ -205,13 +205,13 @@ viewExample example =
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Type" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalType |> format example.formatting ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsType |> format example.formatting ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalType |> annotate example.annotations ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsType |> annotate example.annotations ]
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Example Value" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalValue |> format example.formatting ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsValue |> format example.formatting ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalValue |> annotate example.annotations ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsValue |> annotate example.annotations ]
             ]
         ]
 
@@ -270,7 +270,7 @@ type alias Example =
     , originalValue : String
     , genericsType : String
     , genericsValue : String
-    , formatting : List ( String, String -> Html Msg )
+    , annotations : List ( String, String )
     }
 
 
@@ -292,10 +292,10 @@ examples =
                         (Rec0 Int)))
             """
       , genericsValue = "M1 {unM1 = M1 {unM1 = M1 {unM1 = K1 {unK1 = 5}}}}"
-      , formatting =
-            [ ( "MkId", blue )
-            , ( "Id", orange )
-            , ( "Int", red )
+      , annotations =
+            [ ( "MkId", "Constructor" )
+            , ( "Id", "Type name" )
+            , ( "Int", "Wrapped type" )
             ]
       }
     , { path = "weather"
@@ -311,7 +311,7 @@ examples =
                         :+: C1 ('MetaCons "Rainy" 'PrefixI 'False) U1))
             """
       , genericsValue = "M1 {unM1 = R1 (L1 (M1 {unM1 = U1}))}"
-      , formatting = []
+      , annotations = []
       }
     , { path = "boardgame"
       , originalType =
@@ -356,7 +356,7 @@ examples =
               )
             )
             """
-      , formatting = []
+      , annotations = []
       }
     , { path = "unicorn"
       , originalType = "data Unicorn"
@@ -367,55 +367,47 @@ examples =
               = D1 ('MetaData "Unicorn" "Ghci17" "interactive" 'False) V1
             """
       , genericsValue = "n/a"
-      , formatting = []
+      , annotations = []
       }
     ]
 
 
-orange : String -> Html msg
-orange string =
-    Html.span
-        [ Attr.css
-            [ Css.color (Css.hex "#ffa500")
-            , hoverStyles
-            ]
-        ]
-        [ Html.text string ]
-
-
-blue : String -> Html msg
-blue string =
-    Html.span
-        [ Attr.css
-            [ Css.color (Css.hex "#2b74c1")
-            , hoverStyles
-            ]
-        ]
-        [ Html.text string ]
-
-
-red : String -> Html msg
-red string =
-    Html.span
-        [ Attr.css
-            [ Css.color (Css.hex "#ff0000")
-            , hoverStyles
-            ]
-        ]
-        [ Html.text string ]
-
-
-format : List ( String, String -> Html msg ) -> String -> Html msg
-format replacements_ string =
+annotate : List ( String, a ) -> String -> Html msg
+annotate replacements_ string =
     let
+        colors =
+            colorscheme
+                ++ List.repeat (List.length replacements_) (Css.batch [])
+
         replacements =
-            replacements_
-                |> List.map (\( key, modifier ) -> ( key, modifier key ))
+            List.map2
+                (\( key, _ ) color -> ( key, formatFragment key color ))
+                replacements_
+                colors
+
+        formatFragment : String -> Css.Style -> Html msg
+        formatFragment key color =
+            Html.span
+                [ Attr.css
+                    [ color
+                    , hoverStyles
+                    ]
+                ]
+                [ Html.text key ]
     in
     String.Extra.unindent string
         |> String.trim
         |> replaceWithHtml replacements
         |> Html.code [ Attr.css [ Css.whiteSpace Css.pre ] ]
+
+
+colorscheme : List Css.Style
+colorscheme =
+    List.map (\color -> Css.batch [ Css.color (Css.hex color) ])
+        [ "#ff0000"
+        , "#2b74c1"
+        , "#ffa500"
+        ]
 
 
 replaceWithHtml : List ( String, Html msg ) -> String -> List (Html msg)
