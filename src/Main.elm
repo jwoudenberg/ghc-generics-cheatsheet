@@ -125,17 +125,21 @@ view : Page -> Html Msg
 view page =
     Html.div
         [ Attr.css
-            [ Css.backgroundColor (Css.hex "#ee5185")
-            , Css.position Css.absolute
+            [ Css.position Css.absolute
             , Css.minWidth (Css.vw 100)
             , Css.minHeight (Css.vh 100)
-            , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
             , Css.displayFlex
             , Css.flexDirection Css.column
             , Css.justifyContent Css.spaceBetween
             ]
         ]
-        [ viewPage page
+        [ Css.Global.global
+            [ Css.Global.typeSelector "body"
+                [ Css.backgroundColor (Css.hex "#ee5185")
+                , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
+                ]
+            ]
+        , viewPage page
         , Html.footer
             [ Attr.css
                 [ Css.textAlign Css.center
