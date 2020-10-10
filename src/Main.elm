@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Navigation exposing (Key)
 import Css
 import Dict exposing (Dict)
 import Html.Styled as Html exposing (Html)
@@ -8,26 +9,91 @@ import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
 import List
 import String.Extra
+import Url exposing (Url)
+import Url.Builder
+import Url.Parser
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = IndexPage
+    Browser.application
+        { init =
+            \_ url key ->
+                navigateTo
+                    url
+                    { page = IndexPage
+                    , key = key
+                    , currentPath = "/initial-load"
+                    }
         , update = update
-        , view = Html.toUnstyled << view
+        , view =
+            \model ->
+                { title = "Generics Cheatsheet"
+                , body = [ Html.toUnstyled (view model.page) ]
+                }
+        , subscriptions = \_ -> Sub.none
+        , onUrlRequest = NavigateTo
+        , onUrlChange = NavigateTo << Browser.Internal
         }
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        OpenExample example ->
-            ExamplePage example
+        NavigateTo (Browser.External url) ->
+            ( model
+            , Browser.Navigation.load url
+            )
+
+        NavigateTo (Browser.Internal url) ->
+            navigateTo url model
 
 
-view : Model -> Html Msg
-view model =
+navigateTo : Url -> Model -> ( Model, Cmd Msg )
+navigateTo url model =
+    let
+        parser =
+            Url.Parser.oneOf <|
+                Url.Parser.map IndexPage Url.Parser.top
+                    :: List.map exampleParser examples
+
+        exampleParser example =
+            Url.Parser.map (ExamplePage example) (Url.Parser.s example.path)
+
+        newPage =
+            Url.Parser.parse parser url
+                |> Maybe.withDefault IndexPage
+
+        newUrl =
+            urlForPage newPage
+    in
+    ( { page = newPage
+      , key = model.key
+      , currentPath = url.path
+      }
+    , if url.path == urlForPage newPage then
+        Cmd.none
+
+      else if newUrl /= urlForPage model.page then
+        Browser.Navigation.pushUrl model.key newUrl
+
+      else
+        Browser.Navigation.replaceUrl model.key newUrl
+    )
+
+
+urlForPage : Page -> String
+urlForPage page =
+    case page of
+        IndexPage ->
+            "/"
+
+        ExamplePage example ->
+            "/" ++ Url.Builder.relative [ example.path ] []
+
+
+view : Page -> Html Msg
+view page =
     Html.div
         [ Attr.css
             [ Css.backgroundColor (Css.hex "#ee5185")
@@ -37,12 +103,12 @@ view model =
             , Css.fontFamilies [ "Helvetica Neue", "Helvetica", "Arial", "sans-serif" ]
             ]
         ]
-        [ viewPage model ]
+        [ viewPage page ]
 
 
-viewPage : Model -> Html Msg
-viewPage model =
-    case model of
+viewPage : Page -> Html Msg
+viewPage page =
+    case page of
         IndexPage ->
             Html.div
                 [ Attr.css
@@ -77,8 +143,7 @@ viewSummary : Example -> Html Msg
 viewSummary example =
     Html.li
         [ Attr.css
-            [ Css.padding (Css.px 10)
-            , Css.marginBottom (Css.px 20)
+            [ Css.marginBottom (Css.px 20)
             , Css.fontSize (Css.em 2)
             , Css.lineHeight (Css.em 1)
             , Css.borderRadius (Css.px 2)
@@ -87,7 +152,14 @@ viewSummary example =
             ]
         ]
         [ Html.a
-            [ Events.onClick (OpenExample example) ]
+            [ Attr.href (urlForPage (ExamplePage example))
+            , Attr.css
+                [ Css.color Css.inherit
+                , Css.textDecoration Css.none
+                , Css.display Css.block
+                , Css.padding (Css.px 10)
+                ]
+            ]
             [ example.originalType |> format example.formatting
             ]
         ]
@@ -103,7 +175,21 @@ viewExample example =
             , Css.borderSpacing (Css.px 20)
             ]
         ]
-        [ Html.tr []
+        [ Html.a
+            [ Attr.href (urlForPage IndexPage)
+            , Attr.css
+                [ headerStyles
+                , Css.position Css.absolute
+                , Css.left (Css.px 30)
+                , Css.top Css.zero
+                , Css.fontSize (Css.em 4)
+                , Css.textDecoration Css.none
+                , Css.display Css.block
+                ]
+            ]
+            [ Html.text "‹"
+            ]
+        , Html.tr []
             [ Html.th [] []
             , Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Original" ]
             , Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Generic representation" ]
@@ -153,17 +239,25 @@ hoverStyles =
         ]
 
 
-type Model
+type alias Model =
+    { page : Page
+    , key : Key
+    , currentPath : String
+    }
+
+
+type Page
     = IndexPage
     | ExamplePage Example
 
 
 type Msg
-    = OpenExample Example
+    = NavigateTo Browser.UrlRequest
 
 
 type alias Example =
-    { originalType : String
+    { path : String
+    , originalType : String
     , originalValue : String
     , genericsType : String
     , genericsValue : String
@@ -173,7 +267,8 @@ type alias Example =
 
 examples : List Example
 examples =
-    [ { originalType = "newtype Id = MkId Int"
+    [ { path = "id"
+      , originalType = "newtype Id = MkId Int"
       , originalValue = "MkId 5"
       , genericsType =
             """
@@ -194,7 +289,8 @@ examples =
             , ( "Int", red )
             ]
       }
-    , { originalType = "data Weather = Sunny | Cloudy | Rainy"
+    , { path = "weather"
+      , originalType = "data Weather = Sunny | Cloudy | Rainy"
       , originalValue = "Cloudy"
       , genericsType =
             """
@@ -208,7 +304,8 @@ examples =
       , genericsValue = "M1 {unM1 = R1 (L1 (M1 {unM1 = U1}))}"
       , formatting = []
       }
-    , { originalType =
+    , { path = "boardgame"
+      , originalType =
             """
             data BoardGame =
               BoardGame
@@ -252,7 +349,8 @@ examples =
             """
       , formatting = []
       }
-    , { originalType = "data Unicorn"
+    , { path = "unicorn"
+      , originalType = "data Unicorn"
       , originalValue = "n/a"
       , genericsType =
             """
