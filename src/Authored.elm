@@ -38,6 +38,9 @@ examples =
       , genericsValue = "M1 (M1 (M1 (K1 5)))"
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
+            , metaconsAnnotation
+            , metaselAnnotation
             , { keyword = "MkId"
               , annotation =
                     """
@@ -51,6 +54,7 @@ examples =
                     """
               }
             , typeNameAnnotation "Id"
+            , typeinstanceAnnotation
             ]
       }
     , { path = "weather"
@@ -60,7 +64,7 @@ examples =
             """
             type instance Rep Weather
               = M1 D
-                   ('MetaData "Weather" "Ghci3" "interactive" 'False)
+                   ('MetaData "Weather" "My.Module" "my-package" 'False)
                    (M1 C ('MetaCons "Sunny" 'PrefixI 'False) U1
                     :+:
                     (M1 C ('MetaCons "Cloudy" 'PrefixI 'False) U1
@@ -70,14 +74,17 @@ examples =
       , genericsValue = "M1 (R1 (L1 (M1 U1)))"
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
+            , metaconsAnnotation
             , typeNameAnnotation "Weather"
+            , typeinstanceAnnotation
             ]
       }
     , { path = "boardgame"
       , originalType =
             """
             data BoardGame =
-              BoardGame
+              Stats
                 { name :: Text
                 , maxPlayers :: Int
                 , genre :: Genre
@@ -85,7 +92,7 @@ examples =
             """
       , originalValue =
             """
-            BoardGame
+            Stats
               { name = "Inis"
               , maxPlayers = 4
               , genre = Strategy
@@ -95,9 +102,9 @@ examples =
             """
             type instance Rep BoardGame
               = M1 D
-                   ('MetaData "BoardGame" "Ghci8" "interactive" 'False)
+                   ('MetaData "BoardGame" "My.Module" "my-package" 'False)
                    (M1 C
-                       ('MetaCons "BoardGame" 'PrefixI 'True)
+                       ('MetaCons "Stats" 'PrefixI 'True)
                        (M1 S
                            ('MetaSel ('Just "name") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
                            (Rec0 Text)
@@ -120,7 +127,11 @@ examples =
             """
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
+            , metaconsAnnotation
+            , metaselAnnotation
             , typeNameAnnotation "BoardGame"
+            , typeinstanceAnnotation
             ]
       }
     , { path = "unicorn"
@@ -130,13 +141,15 @@ examples =
             """
             type instance Rep Unicorn
               = M1 D
-                   ('MetaData "Unicorn" "Ghci17" "interactive" 'False)
+                   ('MetaData "Unicorn" "My.Module" "my-package" 'False)
                    V1
             """
       , genericsValue = "n/a"
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
             , typeNameAnnotation "Unicorn"
+            , typeinstanceAnnotation
             ]
       }
     ]
@@ -178,6 +191,111 @@ m1Annotation =
         type C1 = M1 C
         type S1 = M1 S
         ```
+        """
+    }
+
+
+metadataAnnotation : Annotation
+metadataAnnotation =
+    { keyword = "'MetaData"
+    , annotation =
+        """
+        # 'MetaData describes a type
+
+        The `'MetaData` parameters provide information about the original type.
+
+        ```haskell
+        MetaData typename modulename packagename isnewtype
+        ```
+
+        | parameter   | meaning                                                              |
+        | ----------- | -------------------------------------------------------------------- |
+        | typename    | The name of the type. For `data Foo` this is "foo"                   |
+        | modulename  | The module in which this type is defined, e.g. "My.Module"           |
+        | packagename | The package in which this type is defined, e.g. "my-package"         |
+        | isnewtype   | `'True` if defined using `newtype`, `'False` if defined using `data` |
+
+        The prime in `'MetaData` isn't a typo and really part of the name.
+        `'MetaData` gets this prime because it is defined in a peculiar way.
+        We usually define types using the keywords `type`, `newtype`, and `data`, but there's another way:
+        If we enable the `DataKinds` extension in a module GHC will create a type for each constructor in the module, with the same name as the constructor.
+
+        `DataKinds` will give us a type and a constructor with the same name.
+        When we put a prime in front of the name we tell GHC we mean the type, not the constructor.
+        In most uses GHC is able to figure out whether we mean the type or constructor and we can omit the prime.
+        That's why in the [documentation for `'MetaData`][metadata] we see it defined as a constructor of the `Meta` type.
+
+        These automatically generated types `DataKinds` produces don't have any values
+        so their only real use is in phantom types, which is exactly how `'MetaData'` is used!
+
+        If you're interested in learning more about `DataKinds` check out this [blog post on kinds][kinds].
+
+        [metadata]: https://www.stackage.org/haddock/lts-16.17/base-4.13.0.0/GHC-Generics.html#v:MetaData
+        [kinds]: https://diogocastro.com/blog/2018/10/17/haskells-kind-system-a-primer/#datatype-promotion
+        """
+    }
+
+
+metaconsAnnotation : Annotation
+metaconsAnnotation =
+    { keyword = "'MetaCons"
+    , annotation =
+        """
+        """
+    }
+
+
+metaselAnnotation : Annotation
+metaselAnnotation =
+    { keyword = "'MetaSel"
+    , annotation =
+        """
+        """
+    }
+
+
+typeinstanceAnnotation : Annotation
+typeinstanceAnnotation =
+    { keyword = "type instance Rep"
+    , annotation =
+        """
+        # `Rep` is a type family
+
+        GHC Generics are all about taking user defined types of which there are infinitely many,
+        and converting them into a combination of a small number of primitive types.
+        If that sounds a bit like a function to you then you're spot on.
+        The name of the function that performs this conversion is `Rep`,
+        and it takes and returns types instead of regular values.
+        A function on types is sometimes called a type family.
+
+        To understand `Rep` let's first look at a 'regular' Haskell function.
+        Haskell allows us to define functions using multiple definitions, like so:
+
+        ```haskell
+        isEven :: Word -> Bool
+        isEven 0  = True
+        isEven n  = not (isEven (n - 1))
+        ```
+
+        We can define a type family in a similar fashion.
+
+        ```haskell
+        {-# LANGUAGE TypeFamilies #-} 
+
+        data Yep
+        data Nope
+
+        type family HasManyValues a
+        type instance HasManyValues ()        = Nope
+        type instance HasManyValues Bool      = Nope
+        type instance HasManyValues Int       = Yep
+        type instance HasManyValues (Maybe n) = HasManyValues n
+        ```
+
+        `Rep` is very similar to `HasManyValues`.
+        It also takes a single argument (an original type) and returns another type (the generic representation).
+        We can manually write a line `type instance Rep MyType` if we want,
+        but usually tell GHC it should do it for us by adding `deriving (Generic)` to a type.
         """
     }
 

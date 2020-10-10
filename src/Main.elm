@@ -3,6 +3,7 @@ module Main exposing (main)
 import Authored
 import Browser
 import Browser.Navigation exposing (Key)
+import Colors
 import Css
 import Css.Global
 import Dict exposing (Dict)
@@ -98,7 +99,7 @@ parseUrl url =
         annotationParser example annotation =
             Url.Parser.map
                 (AnnotationPage example annotation)
-                (Url.Parser.s (String.toLower annotation.keyword))
+                (Url.Parser.s (toParam annotation.keyword))
     in
     Url.Parser.parse parser url
         |> Maybe.withDefault IndexPage
@@ -116,7 +117,7 @@ urlForPage page =
                     [ example.path ]
 
                 AnnotationPage example annotation ->
-                    [ example.path, String.toLower annotation.keyword ]
+                    [ example.path, toParam annotation.keyword ]
     in
     "/" ++ Url.Builder.relative segments []
 
@@ -147,11 +148,10 @@ view page =
                 , Css.padding (Css.px 10)
                 ]
             ]
-            [ Html.text "© 2020 Jasper Woudenberg"
+            [ Html.text "© 2020 Jasper Woudenberg - "
             , Html.a
                 [ Attr.css
-                    [ Css.marginLeft (Css.px 60)
-                    , Css.color Css.inherit
+                    [ Css.color Css.inherit
                     ]
                 , Attr.href "https://github.com/jwoudenberg/ghc-generics-cheatsheet"
                 ]
@@ -220,9 +220,8 @@ viewPage page =
                                 [ headerStyles
                                 ]
                             , Css.Global.typeSelector "p"
-                                [ Css.opacity (Css.num 0.8)
-                                , Css.fontSize (Css.em 1.1)
-                                , Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.2)
+                                [ Css.fontSize (Css.em 1.1)
+                                , Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.3)
                                 ]
                             , Css.Global.typeSelector "a"
                                 [ Css.color Css.inherit
@@ -239,7 +238,7 @@ viewPage page =
                                 , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
                                 ]
                             , Css.Global.typeSelector "table"
-                                [ Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.2)
+                                [ Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.3)
                                 ]
                             , Css.Global.typeSelector "td"
                                 [ Css.paddingRight (Css.em 2)
@@ -411,11 +410,9 @@ viewExampleText getString example =
 
 colorscheme : List Css.Style
 colorscheme =
-    List.map (\color -> Css.batch [ Css.color (Css.hex color) ])
-        [ "#ff0000"
-        , "#2b74c1"
-        , "#ffa500"
-        ]
+    List.map
+        (\color -> Css.batch [ Css.color (Css.hex color) ])
+        Colors.colors
 
 
 replaceWithHtml : List ( String, Html msg ) -> String -> List (Html msg)
@@ -433,3 +430,9 @@ replaceWithHtml breakers string =
                 |> List.map (replaceWithHtml rest)
                 |> List.intersperse [ replacement ]
                 |> List.concatMap identity
+
+
+toParam : String -> String
+toParam str =
+    String.toLower str
+        |> String.replace " " "-"
