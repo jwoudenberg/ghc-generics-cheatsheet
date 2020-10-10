@@ -1,0 +1,8 @@
+[build]
+publish = "public/"
+command = "elm make --optimize src/Main.elm --output public/index.html"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
