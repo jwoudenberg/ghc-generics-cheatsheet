@@ -19,9 +19,7 @@ main =
     Browser.application
         { init =
             \_ url key ->
-                navigateTo
-                    url
-                    False
+                update (NavigatedTo url)
                     { page = IndexPage
                     , key = key
                     }
@@ -46,42 +44,52 @@ update msg model =
             )
 
         NavigateTo (Browser.Internal url) ->
-            navigateTo url True model
+            ( model
+            , let
+                normalizedUrl =
+                    urlForPage (parseUrl url)
+              in
+              if normalizedUrl == urlForPage model.page then
+                Cmd.none
+
+              else
+                Browser.Navigation.pushUrl model.key normalizedUrl
+            )
 
         NavigatedTo url ->
-            navigateTo url False model
+            let
+                newPage =
+                    parseUrl url
+
+                normalizedUrl =
+                    urlForPage newPage
+            in
+            ( if normalizedUrl == urlForPage model.page then
+                model
+
+              else
+                { model | page = newPage }
+            , if url.path == normalizedUrl then
+                Cmd.none
+
+              else
+                Browser.Navigation.replaceUrl model.key normalizedUrl
+            )
 
 
-navigateTo : Url -> Bool -> Model -> ( Model, Cmd Msg )
-navigateTo url push model =
+parseUrl : Url -> Page
+parseUrl url =
     let
+        exampleParser example =
+            Url.Parser.map (ExamplePage example) (Url.Parser.s example.path)
+
         parser =
             Url.Parser.oneOf <|
                 Url.Parser.map IndexPage Url.Parser.top
                     :: List.map exampleParser examples
-
-        exampleParser example =
-            Url.Parser.map (ExamplePage example) (Url.Parser.s example.path)
-
-        newPage =
-            Url.Parser.parse parser url
-                |> Maybe.withDefault IndexPage
-
-        newUrl =
-            urlForPage newPage
     in
-    ( { page = newPage
-      , key = model.key
-      }
-    , if url.path == urlForPage model.page then
-        Cmd.none
-
-      else if push then
-        Browser.Navigation.pushUrl model.key newUrl
-
-      else
-        Browser.Navigation.replaceUrl model.key newUrl
-    )
+    Url.Parser.parse parser url
+        |> Maybe.withDefault IndexPage
 
 
 urlForPage : Page -> String
