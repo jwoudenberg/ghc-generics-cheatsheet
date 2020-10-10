@@ -155,7 +155,17 @@ view page =
                     ]
                 , Attr.href "https://github.com/jwoudenberg/ghc-generics-cheatsheet"
                 ]
-                [ Html.text "Code on Github" ]
+                [ Html.text "This Code"
+                ]
+            , Html.text " - "
+            , Html.a
+                [ Attr.css
+                    [ Css.color Css.inherit
+                    ]
+                , Attr.href "https://dev.to/jwoudenberg"
+                ]
+                [ Html.text "My Blog"
+                ]
             ]
         ]
 
