@@ -190,11 +190,19 @@ viewPage page =
 
         AnnotationPage example annotation ->
             let
+                options : Markdown.Options
+                options =
+                    { githubFlavored = Just { tables = True, breaks = False }
+                    , defaultHighlighting = Nothing
+                    , sanitize = True
+                    , smartypants = True
+                    }
+
                 markdown =
                     annotation.annotation
                         |> String.Extra.unindent
                         |> String.trim
-                        |> Markdown.toHtml []
+                        |> Markdown.toHtmlWith options []
                         |> Html.fromUnstyled
             in
             Html.div
@@ -208,15 +216,27 @@ viewPage page =
                         , Css.Global.typeSelector "p"
                             [ Css.opacity (Css.num 0.8)
                             , Css.fontSize (Css.em 1.1)
+                            , Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.2)
                             ]
                         , Css.Global.typeSelector "code"
+                            [ Css.fontSize (Css.em 1.1)
+                            ]
+                        , Css.Global.typeSelector "pre"
                             [ Css.backgroundColor (Css.hex "#fff")
-                            , Css.fontSize (Css.em 1.1)
                             , Css.lineHeight (Css.em 1)
                             , Css.display Css.block
                             , Css.padding (Css.px 10)
                             , Css.borderRadius (Css.px 2)
                             , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
+                            ]
+                        , Css.Global.typeSelector "table"
+                            [ Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.2)
+                            ]
+                        , Css.Global.typeSelector "td"
+                            [ Css.paddingRight (Css.em 2)
+                            ]
+                        , Css.Global.typeSelector "th"
+                            [ Css.paddingRight (Css.em 2)
                             ]
                         ]
                     ]
