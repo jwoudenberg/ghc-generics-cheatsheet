@@ -61,7 +61,7 @@ examples =
             """
             type instance Rep Weather
               = M1 D
-                   ('MetaData "Weather" "Ghci3" "interactive" 'False)
+                   ('MetaData "Weather" "My.Module" "my-package" 'False)
                    (M1 C ('MetaCons "Sunny" 'PrefixI 'False) U1
                     :+:
                     (M1 C ('MetaCons "Cloudy" 'PrefixI 'False) U1
@@ -97,7 +97,7 @@ examples =
             """
             type instance Rep BoardGame
               = M1 D
-                   ('MetaData "BoardGame" "Ghci8" "interactive" 'False)
+                   ('MetaData "BoardGame" "My.Module" "my-package" 'False)
                    (M1 C
                        ('MetaCons "Stats" 'PrefixI 'True)
                        (M1 S
@@ -133,7 +133,7 @@ examples =
             """
             type instance Rep Unicorn
               = M1 D
-                   ('MetaData "Unicorn" "Ghci17" "interactive" 'False)
+                   ('MetaData "Unicorn" "My.Module" "my-package" 'False)
                    V1
             """
       , genericsValue = "n/a"
