@@ -147,11 +147,10 @@ view page =
                 , Css.padding (Css.px 10)
                 ]
             ]
-            [ Html.text "© 2020 Jasper Woudenberg"
+            [ Html.text "© 2020 Jasper Woudenberg - "
             , Html.a
                 [ Attr.css
-                    [ Css.marginLeft (Css.px 60)
-                    , Css.color Css.inherit
+                    [ Css.color Css.inherit
                     ]
                 , Attr.href "https://github.com/jwoudenberg/ghc-generics-cheatsheet"
                 ]
@@ -220,9 +219,8 @@ viewPage page =
                                 [ headerStyles
                                 ]
                             , Css.Global.typeSelector "p"
-                                [ Css.opacity (Css.num 0.8)
-                                , Css.fontSize (Css.em 1.1)
-                                , Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.2)
+                                [ Css.fontSize (Css.em 1.1)
+                                , Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.3)
                                 ]
                             , Css.Global.typeSelector "a"
                                 [ Css.color Css.inherit
@@ -239,7 +237,7 @@ viewPage page =
                                 , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
                                 ]
                             , Css.Global.typeSelector "table"
-                                [ Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.2)
+                                [ Css.textShadow4 Css.zero Css.zero (Css.px 1) (Css.rgba 255 255 255 0.3)
                                 ]
                             , Css.Global.typeSelector "td"
                                 [ Css.paddingRight (Css.em 2)
