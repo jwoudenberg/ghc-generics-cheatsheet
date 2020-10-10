@@ -3,6 +3,7 @@ module Main exposing (main)
 import Authored
 import Browser
 import Browser.Navigation exposing (Key)
+import Colors
 import Css
 import Css.Global
 import Dict exposing (Dict)
@@ -409,11 +410,9 @@ viewExampleText getString example =
 
 colorscheme : List Css.Style
 colorscheme =
-    List.map (\color -> Css.batch [ Css.color (Css.hex color) ])
-        [ "#ff0000"
-        , "#2b74c1"
-        , "#ffa500"
-        ]
+    List.map
+        (\color -> Css.batch [ Css.color (Css.hex color) ])
+        Colors.colors
 
 
 replaceWithHtml : List ( String, Html msg ) -> String -> List (Html msg)
