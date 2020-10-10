@@ -38,6 +38,7 @@ examples =
       , genericsValue = "M1 (M1 (M1 (K1 5)))"
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
             , { keyword = "MkId"
               , annotation =
                     """
@@ -70,6 +71,7 @@ examples =
       , genericsValue = "M1 (R1 (L1 (M1 U1)))"
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
             , typeNameAnnotation "Weather"
             ]
       }
@@ -120,6 +122,7 @@ examples =
             """
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
             , typeNameAnnotation "BoardGame"
             ]
       }
@@ -136,6 +139,7 @@ examples =
       , genericsValue = "n/a"
       , annotations =
             [ m1Annotation
+            , metadataAnnotation
             , typeNameAnnotation "Unicorn"
             ]
       }
@@ -178,6 +182,47 @@ m1Annotation =
         type C1 = M1 C
         type S1 = M1 S
         ```
+        """
+    }
+
+
+metadataAnnotation : Annotation
+metadataAnnotation =
+    { keyword = "'MetaData"
+    , annotation =
+        """
+        # 'MetaData describes a type
+
+        The `'MetaData` parameters provide information about the original type.
+
+        ```haskell
+        MetaData typename modulename packagename isnewtype
+        ```
+
+        | parameter   | meaning                                                              |
+        | ----------- | -------------------------------------------------------------------- |
+        | typename    | The name of the type. For `data Foo` this is "foo"                   |
+        | modulename  | The module in which this type is defined, e.g. "My.Module"           |
+        | packagename | The package in which this type is defined, e.g. "my-package"         |
+        | isnewtype   | `'True` if defined using `newtype`, `'False` if defined using `data` |
+
+        The prime in `'MetaData` isn't a typo and really part of the name.
+        `'MetaData` gets this prime because it is defined in a peculiar way.
+        We usually define types using the keywords `type`, `newtype`, and `data`, but there's another way:
+        If we enable the `DataKinds` extension in a module GHC will create a type for each constructor in the module, with the same name as the constructor.
+
+        `DataKinds` will give us a type and a constructor with the same name.
+        When we put a prime in front of the name we tell GHC we mean the type, not the constructor.
+        In most uses GHC is able to figure out whether we mean the type or constructor and we can omit the prime.
+        That's why in the [documentation for `'MetaData`][metadata] we see it defined as a constructor of the `Meta` type.
+
+        These automatically generated types `DataKinds` produces don't have any values
+        so their only real use is in phantom types, which is exactly how `'MetaData'` is used!
+
+        If you're interested in learning more about `DataKinds` check out this [blog post on kinds][kinds].
+
+        [metadata]: https://www.stackage.org/haddock/lts-16.17/base-4.13.0.0/GHC-Generics.html#v:MetaData
+        [kinds]: https://diogocastro.com/blog/2018/10/17/haskells-kind-system-a-primer/#datatype-promotion
         """
     }
 
