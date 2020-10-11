@@ -41,18 +41,7 @@ examples =
             , metadataAnnotation
             , metaconsAnnotation
             , metaselAnnotation
-            , { keyword = "MkId"
-              , annotation =
-                    """
-                    # Constructor name
-
-                    The constructor name is provided as metadata in the generics representation.
-
-                    ```hs
-                    newtype Id = MkId Int
-                    ```
-                    """
-              }
+            , constructorNameAnnotation "MkId"
             , typeNameAnnotation "Id"
             , typeinstanceAnnotation
             ]
@@ -77,6 +66,9 @@ examples =
             , metadataAnnotation
             , metaconsAnnotation
             , typeNameAnnotation "Weather"
+            , constructorNameAnnotation "Sunny"
+            , constructorNameAnnotation "Cloudy"
+            , constructorNameAnnotation "Rainy"
             , typeinstanceAnnotation
             ]
       }
@@ -131,6 +123,10 @@ examples =
             , metaconsAnnotation
             , metaselAnnotation
             , typeNameAnnotation "BoardGame"
+            , constructorNameAnnotation "Stats"
+            , fieldNameAnnotation "name"
+            , fieldNameAnnotation "maxPlayers"
+            , fieldNameAnnotation "genre"
             , typeinstanceAnnotation
             ]
       }
@@ -416,4 +412,18 @@ typeNameAnnotation keyword =
 
         [symbolval]: https://www.stackage.org/haddock/lts-16.17/base-4.13.0.0/GHC-TypeLits.html#v:symbolVal
         """
+    }
+
+
+fieldNameAnnotation : String -> Annotation
+fieldNameAnnotation keyword =
+    { keyword = keyword
+    , annotation = metaselAnnotation.annotation
+    }
+
+
+constructorNameAnnotation : String -> Annotation
+constructorNameAnnotation keyword =
+    { keyword = keyword
+    , annotation = metaconsAnnotation.annotation
     }
