@@ -168,7 +168,7 @@ m1Annotation =
     , keyword = "M1"
     , annotation =
         """
-        # M1 contains metadata
+        # `M1` contains metadata
 
         The `M1` type attaches metadata to the type it wraps.
         We see a lot of these in Generics representations,
@@ -209,6 +209,39 @@ k1Annotation =
     , keyword = "K1"
     , annotation =
         """
+        # `K1` wraps included types
+
+        Types we write often contain other types. For example, the `Treasure`
+        type below contains the `Coords` and `Int` types.
+
+        ```haskell
+        data Treasure = Treasure { where :: Coords, guilders :: Int }
+                                            ^^^^^^              ^^^
+        ```
+
+        When we add `deriving (Generic)` to a type GHC produces a generic
+        representation of the type but doesn't recurse into its component
+        types. Those compont types are still around in the generic
+        representation, wrapped in a `K1`.
+
+        `K1` is defined as follows:
+
+        ```haskell
+        newtype K1 rec c p = K1 c 
+        ```
+
+        There's two phantom parameters `rec` and `p`, and neither has any
+        meaning. `p` exists solely for future exensibility and doesn't have a
+        purpose today (all generics building blocks have this phantom type `p`
+        and pass it through). `rec` used to have two possible values, but one
+        got deprecated, so now it's always the same thing: `R`.
+
+        When printing generics representations of types `K1` often shows up
+        under a different name, `Rec0`. That's `K1` with `R` already applied:
+
+        ```haskell
+        type Rec0 = K1 R
+        ```
         """
     }
 
