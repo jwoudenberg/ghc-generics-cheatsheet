@@ -205,7 +205,7 @@ metadataAnnotation =
         The `'MetaData` parameters provide information about the original type.
 
         ```haskell
-        MetaData typename modulename packagename isnewtype
+        'MetaData typename modulename packagename isnewtype
         ```
 
         | parameter   | meaning                                                              |
@@ -246,7 +246,7 @@ metaconsAnnotation =
         `'MetaCons` contains information about a single constructor of a type.
 
         ```haskell
-        MetaCons constructorname fixity isrecord
+        'MetaCons constructorname fixity isrecord
         ```
 
         | parameter       | meaning                                                                   |
@@ -280,6 +280,44 @@ metaselAnnotation =
     { keyword = "'MetaSel"
     , annotation =
         """
+        # `'MetaSel` describes a constructor parameter
+
+        `'MetaSel` tells us about a single parameter of a constructor.
+
+        ```haskell
+        'MetaSel fieldname unpackedness sourcestrictness decidedstrictness
+        ```
+
+        | parameter         | meaning                                                                   |
+        | ----------------- | ------------------------------------------------------------------------- |
+        | fieldname         | A type level `Maybe` containing the field name if this is a record field. |
+        | unpackedness      | The [unpackedness][] of the field.                                        |
+        | sourcestrictness  | Strictness of this parameter according to the code.                       |
+        | decidedstrictness | Actual strictness decided by GHC, considering compilation flags.          |
+
+        The `'MetaSel` is used both to describe a regular parameter and a single field of a record.
+        Both are treated as parameters to a constructor.
+        
+        ```haskell
+        data Person = Person { name : Text, age : Int }
+        data Person = Person          Text        Int
+        ```
+
+        The strictness tells us whether a parameter is strict,
+        meaning values stored in there will be immediately evaluated, or lazy.
+        Haskell allows us to specify which we want when we define the type:
+
+        ```haskell
+        data Humidity = Humidity  Double  -- no annotation (defaults to lazy)
+        data Humidity = Humidity !Double  -- explicitly strict
+        data Humidity = Humidity ~Double  -- explicitly lazy
+        ```
+
+        The `sourcestrictness` option tells us which of the three options above appears in the code.
+        The `decidedstrictness` option tells us what strictness GHC decided for the parameter,
+        based on the code but also on compiler options, such as a the `StrictData` language extension.
+
+        [unpackedness]: https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#unpack-pragma
         """
     }
 
