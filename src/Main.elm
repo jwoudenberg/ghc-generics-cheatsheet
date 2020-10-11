@@ -546,6 +546,6 @@ replaceWithHtml keywords string =
 keywordClass : String -> String
 keywordClass str =
     "keyword-"
-        ++ String.toLower str
+        ++ str
         |> String.replace " " "-"
         |> String.replace "'" ""

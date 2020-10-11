@@ -32,18 +32,21 @@ examples =
                        ('MetaCons "MkId" 'PrefixI 'False)
                        (M1 S
                            ('MetaSel 'Nothing 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                           (Rec0 Int)
+                           (K1 R Int)
                        )
                     )
             """
       , genericsValue = "M1 (M1 (M1 (K1 5)))"
       , annotations =
             [ m1Annotation
+            , k1Annotation
             , metadataAnnotation
             , metaconsAnnotation
             , metaselAnnotation
             , constructorNameAnnotation "MkId"
             , typeNameAnnotation "Id"
+            , wrappedTypeAnnotation "Int"
+            , wrappedValueAnnotation "5"
             , typeinstanceAnnotation
             ]
       }
@@ -100,15 +103,15 @@ examples =
                        ('MetaCons "Stats" 'PrefixI 'True)
                        (M1 S
                            ('MetaSel ('Just "name") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                           (Rec0 Text)
+                           (K1 R Text)
                         :*:
                         (M1 S
                             ('MetaSel ('Just "maxPlayers") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                            (Rec0 Int)
+                            (K1 R Int)
                          :*:
                          M1 S
                             ('MetaSel ('Just "genre") 'NoSourceUnpackedness 'NoSourceStrictness 'DecidedLazy)
-                            (Rec0 Genre))))
+                            (K1 R Genre))))
             """
       , genericsValue =
             """
@@ -120,6 +123,7 @@ examples =
             """
       , annotations =
             [ m1Annotation
+            , k1Annotation
             , metadataAnnotation
             , metaconsAnnotation
             , metaselAnnotation
@@ -128,6 +132,12 @@ examples =
             , fieldNameAnnotation "name"
             , fieldNameAnnotation "maxPlayers"
             , fieldNameAnnotation "genre"
+            , wrappedTypeAnnotation "Text"
+            , wrappedTypeAnnotation "Int"
+            , wrappedTypeAnnotation "Genre"
+            , wrappedValueAnnotation "Inis"
+            , wrappedValueAnnotation "4"
+            , wrappedValueAnnotation "Strategy"
             , typeinstanceAnnotation
             ]
       }
@@ -189,6 +199,16 @@ m1Annotation =
         type C1 = M1 C
         type S1 = M1 S
         ```
+        """
+    }
+
+
+k1Annotation : Annotation
+k1Annotation =
+    { path = "k1"
+    , keyword = "K1"
+    , annotation =
+        """
         """
     }
 
@@ -430,3 +450,13 @@ fieldNameAnnotation keyword =
 constructorNameAnnotation : String -> Annotation
 constructorNameAnnotation keyword =
     { metaconsAnnotation | keyword = keyword }
+
+
+wrappedTypeAnnotation : String -> Annotation
+wrappedTypeAnnotation keyword =
+    { k1Annotation | keyword = keyword }
+
+
+wrappedValueAnnotation : String -> Annotation
+wrappedValueAnnotation keyword =
+    { k1Annotation | keyword = keyword }
