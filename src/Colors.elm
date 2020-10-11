@@ -7,16 +7,18 @@ module Colors exposing (colors)
 colors : List String
 colors =
     [ "#e53935"
-    , "#ff8784"
     , "#91b859"
-    , "#b8d88a"
     , "#ffb62c"
-    , "#ffd077"
     , "#6182b8"
-    , "#92abd4"
     , "#7c4dff"
-    , "#b195ff"
     , "#39adb5"
-    , "#66d2d9"
     , "#acb8be"
+
+    -- Light colors
+    , "#ff8784"
+    , "#b8d88a"
+    , "#ffd077"
+    , "#92abd4"
+    , "#b195ff"
+    , "#66d2d9"
     ]

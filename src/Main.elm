@@ -12,6 +12,7 @@ import Html.Styled.Attributes as Attr
 import Html.Styled.Events as Events
 import List
 import Markdown
+import Set exposing (Set)
 import String.Extra
 import Url exposing (Url)
 import Url.Builder
@@ -389,16 +390,66 @@ htmlExamples =
 
 htmlifyExample : Authored.Example String -> Authored.Example (Html Msg)
 htmlifyExample example =
+    let
+        originalType =
+            viewExampleText .originalType example
+
+        originalValue =
+            viewExampleText .originalValue example
+
+        genericsType =
+            viewExampleText .genericsType example
+
+        genericsValue =
+            viewExampleText .genericsValue example
+
+        keywordsToHighlight =
+            membersOfAtLeastTwo
+                [ originalType.keywordsFound
+                , originalValue.keywordsFound
+                , genericsType.keywordsFound
+                , genericsValue.keywordsFound
+                ]
+
+        withHighlights : Html msg -> Html msg
+        withHighlights code =
+            Html.div
+                [ Attr.css
+                    [ Css.Global.descendants <|
+                        List.map2
+                            (\keyword color ->
+                                Css.Global.class (keywordClass keyword) [ color ]
+                            )
+                            (Set.toList keywordsToHighlight)
+                            colorscheme
+                    ]
+                ]
+                [ code ]
+    in
     { path = example.path
-    , originalType = viewExampleText .originalType example
-    , originalValue = viewExampleText .originalValue example
-    , genericsType = viewExampleText .genericsType example
-    , genericsValue = viewExampleText .genericsValue example
+    , originalType = withHighlights originalType.result
+    , originalValue = withHighlights originalValue.result
+    , genericsType = withHighlights genericsType.result
+    , genericsValue = withHighlights genericsValue.result
     , annotations = example.annotations
     }
 
 
-viewExampleText : (Authored.Example String -> String) -> Authored.Example String -> Html msg
+membersOfAtLeastTwo : List (Set comparable) -> Set comparable
+membersOfAtLeastTwo sets =
+    case sets of
+        [] ->
+            Set.empty
+
+        x :: rest ->
+            membersOfAtLeastTwo rest
+                |> Set.union (Set.intersect x (List.foldl Set.union Set.empty rest))
+
+
+viewExampleText :
+    (Authored.Example String -> String)
+    -> Authored.Example String
+    -> { keywordsFound : Set String, result : Html msg }
 viewExampleText getString example =
     let
         replacements =
@@ -413,6 +464,7 @@ viewExampleText getString example =
                 ]
                 [ Html.a
                     [ Attr.href (urlForPage (AnnotationPage example annotation))
+                    , Attr.class (keywordClass annotation.keyword)
                     , Attr.css
                         [ Css.color Css.inherit
                         , Css.textDecoration Css.none
@@ -432,7 +484,11 @@ viewExampleText getString example =
     String.Extra.unindent (getString example)
         |> String.trim
         |> replaceWithHtml replacements
-        |> Html.code [ Attr.css [ Css.whiteSpace Css.pre ] ]
+        |> (\{ keywordsFound, result } ->
+                { keywordsFound = keywordsFound
+                , result = Html.code [ Attr.css [ Css.whiteSpace Css.pre ] ] result
+                }
+           )
 
 
 colorscheme : List Css.Style
@@ -442,21 +498,47 @@ colorscheme =
         Colors.colors
 
 
-replaceWithHtml : List ( String, Html msg ) -> String -> List (Html msg)
-replaceWithHtml breakers string =
-    case breakers of
+replaceWithHtml : List ( String, Html msg ) -> String -> { keywordsFound : Set String, result : List (Html msg) }
+replaceWithHtml keywords string =
+    case keywords of
         [] ->
-            if String.isEmpty string then
-                []
+            { keywordsFound = Set.empty
+            , result =
+                if String.isEmpty string then
+                    []
 
-            else
-                [ Html.text string ]
+                else
+                    [ Html.text string ]
+            }
 
-        ( breaker, replacement ) :: rest ->
-            String.split breaker string
-                |> List.map (replaceWithHtml rest)
-                |> List.intersperse [ replacement ]
-                |> List.concatMap identity
+        ( keyword, replacement ) :: rest ->
+            let
+                returns =
+                    String.split keyword string
+                        |> List.map (replaceWithHtml rest)
+
+                remainsAfterSplit =
+                    List.map .result returns
+
+                keywordsFound =
+                    List.foldl (Set.union << .keywordsFound) Set.empty returns
+            in
+            { keywordsFound =
+                if List.length remainsAfterSplit > 1 then
+                    Set.insert keyword keywordsFound
+
+                else
+                    keywordsFound
+            , result =
+                remainsAfterSplit
+                    |> List.intersperse [ replacement ]
+                    |> List.concatMap identity
+            }
+
+
+keywordClass : String -> String
+keywordClass str =
+    "keyword-" ++ toParam str
 
 
 toParam : String -> String
