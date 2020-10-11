@@ -81,13 +81,13 @@ update msg model =
             )
 
 
-parseUrl : Url -> Page
+parseUrl : Url -> Page (Html Msg)
 parseUrl url =
     let
         parser =
             Url.Parser.oneOf <|
                 Url.Parser.map IndexPage Url.Parser.top
-                    :: List.map exampleParser Authored.examples
+                    :: List.map exampleParser htmlExamples
 
         exampleParser example =
             Url.Parser.s example.path
@@ -105,7 +105,7 @@ parseUrl url =
         |> Maybe.withDefault IndexPage
 
 
-urlForPage : Page -> String
+urlForPage : Page a -> String
 urlForPage page =
     let
         segments =
@@ -122,7 +122,7 @@ urlForPage page =
     "/" ++ Url.Builder.relative segments []
 
 
-view : Page -> Html Msg
+view : Page (Html Msg) -> Html Msg
 view page =
     Html.div
         [ Attr.css
@@ -170,7 +170,7 @@ view page =
         ]
 
 
-viewPage : Page -> Html Msg
+viewPage : Page (Html Msg) -> Html Msg
 viewPage page =
     case page of
         IndexPage ->
@@ -196,7 +196,7 @@ viewPage page =
                         , Css.padding Css.zero
                         ]
                     ]
-                    (List.map viewSummary Authored.examples)
+                    (List.map viewSummary htmlExamples)
                 ]
 
         ExamplePage example ->
@@ -271,7 +271,7 @@ viewPage page =
                 ]
 
 
-viewSummary : Authored.Example String -> Html Msg
+viewSummary : Authored.Example (Html Msg) -> Html Msg
 viewSummary example =
     Html.li
         [ Attr.css
@@ -292,17 +292,13 @@ viewSummary example =
                 , Css.padding (Css.px 10)
                 ]
             ]
-            [ (htmlifyExample example).originalType
+            [ example.originalType
             ]
         ]
 
 
-viewExample : Authored.Example String -> Html Msg
+viewExample : Authored.Example (Html Msg) -> Html Msg
 viewExample example =
-    let
-        htmlExample =
-            htmlifyExample example
-    in
     Html.table
         [ Attr.css
             [ Css.minWidth (Css.vw 100)
@@ -318,18 +314,18 @@ viewExample example =
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Type" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.originalType ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.genericsType ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalType ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsType ]
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Example Value" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.originalValue ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.genericsValue ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.originalValue ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ example.genericsValue ]
             ]
         ]
 
 
-viewBackArrow : Page -> Html Msg
+viewBackArrow : Page a -> Html Msg
 viewBackArrow page =
     Html.a
         [ Attr.href (urlForPage page)
@@ -370,20 +366,25 @@ headerStyles =
 
 
 type alias Model =
-    { page : Page
+    { page : Page (Html Msg)
     , key : Key
     }
 
 
-type Page
+type Page a
     = IndexPage
-    | ExamplePage (Authored.Example String)
-    | AnnotationPage (Authored.Example String) Authored.Annotation
+    | ExamplePage (Authored.Example a)
+    | AnnotationPage (Authored.Example a) Authored.Annotation
 
 
 type Msg
     = NavigateTo Browser.UrlRequest
     | NavigatedTo Url
+
+
+htmlExamples : List (Authored.Example (Html Msg))
+htmlExamples =
+    List.map htmlifyExample Authored.examples
 
 
 htmlifyExample : Authored.Example String -> Authored.Example (Html Msg)
