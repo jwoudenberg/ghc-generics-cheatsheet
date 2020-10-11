@@ -271,7 +271,7 @@ viewPage page =
                 ]
 
 
-viewSummary : Authored.Example -> Html Msg
+viewSummary : Authored.Example String -> Html Msg
 viewSummary example =
     Html.li
         [ Attr.css
@@ -297,7 +297,7 @@ viewSummary example =
         ]
 
 
-viewExample : Authored.Example -> Html Msg
+viewExample : Authored.Example String -> Html Msg
 viewExample example =
     Html.table
         [ Attr.css
@@ -373,8 +373,8 @@ type alias Model =
 
 type Page
     = IndexPage
-    | ExamplePage Authored.Example
-    | AnnotationPage Authored.Example Authored.Annotation
+    | ExamplePage (Authored.Example String)
+    | AnnotationPage (Authored.Example String) Authored.Annotation
 
 
 type Msg
@@ -382,7 +382,7 @@ type Msg
     | NavigatedTo Url
 
 
-viewExampleText : (Authored.Example -> String) -> Authored.Example -> Html msg
+viewExampleText : (Authored.Example String -> String) -> Authored.Example String -> Html msg
 viewExampleText getString example =
     let
         colors =

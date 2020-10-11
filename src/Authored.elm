@@ -1,12 +1,12 @@
 module Authored exposing (Annotation, Example, examples)
 
 
-type alias Example =
+type alias Example a =
     { path : String
-    , originalType : String
-    , originalValue : String
-    , genericsType : String
-    , genericsValue : String
+    , originalType : a
+    , originalValue : a
+    , genericsType : a
+    , genericsValue : a
     , annotations : List Annotation
     }
 
@@ -17,7 +17,7 @@ type alias Annotation =
     }
 
 
-examples : List Example
+examples : List (Example String)
 examples =
     [ { path = "id"
       , originalType = "newtype Id = MkId Int"
