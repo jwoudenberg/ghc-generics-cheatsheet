@@ -303,7 +303,7 @@ sumAnnotations =
 
                     | value              | `:*:` representation | `Either` representation    |
                     | ------------------ | -------------------- | -------------------------- |
-                    | `Chant "AWAKEN!"`  | `L1 "Awaken"`        | `Left "Awaken"`            |
+                    | `Chant "AWAKEN!"`  | `L1 "AWAKEN!"`       | `Left "AWAKEN!"`           |
                     | `Smash Medallion`  | `R1 (L1 Medallion)`  | `Right (Left Medallion)`   |
                     | `Drink Pollyjuice` | `R1 (R1 Pollyjuice)` | `Right (Right Pollyjuice)` |
 
