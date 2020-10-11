@@ -12,7 +12,8 @@ type alias Example a =
 
 
 type alias Annotation =
-    { keyword : String
+    { path : String
+    , keyword : String
     , annotation : String
     }
 
@@ -153,7 +154,8 @@ examples =
 
 m1Annotation : Annotation
 m1Annotation =
-    { keyword = "M1"
+    { path = "m1"
+    , keyword = "M1"
     , annotation =
         """
         # M1 contains metadata
@@ -193,7 +195,8 @@ m1Annotation =
 
 metadataAnnotation : Annotation
 metadataAnnotation =
-    { keyword = "'MetaData"
+    { path = "metadata"
+    , keyword = "'MetaData"
     , annotation =
         """
         # `'MetaData` describes a type
@@ -234,7 +237,8 @@ metadataAnnotation =
 
 metaconsAnnotation : Annotation
 metaconsAnnotation =
-    { keyword = "'MetaCons"
+    { path = "metacons"
+    , keyword = "'MetaCons"
     , annotation =
         """
         # `'MetaCons` describes a constructor
@@ -273,7 +277,8 @@ metaconsAnnotation =
 
 metaselAnnotation : Annotation
 metaselAnnotation =
-    { keyword = "'MetaSel"
+    { path = "metasel"
+    , keyword = "'MetaSel"
     , annotation =
         """
         # `'MetaSel` describes a constructor parameter
@@ -320,7 +325,8 @@ metaselAnnotation =
 
 typeinstanceAnnotation : Annotation
 typeinstanceAnnotation =
-    { keyword = "type instance Rep"
+    { path = "rep"
+    , keyword = "type instance Rep"
     , annotation =
         """
         # `Rep` is a type family
@@ -366,7 +372,8 @@ typeinstanceAnnotation =
 
 typeNameAnnotation : String -> Annotation
 typeNameAnnotation keyword =
-    { keyword = keyword
+    { path = "typename"
+    , keyword = keyword
     , annotation =
         """
         # Type Name
@@ -417,13 +424,9 @@ typeNameAnnotation keyword =
 
 fieldNameAnnotation : String -> Annotation
 fieldNameAnnotation keyword =
-    { keyword = keyword
-    , annotation = metaselAnnotation.annotation
-    }
+    { metaselAnnotation | keyword = keyword }
 
 
 constructorNameAnnotation : String -> Annotation
 constructorNameAnnotation keyword =
-    { keyword = keyword
-    , annotation = metaconsAnnotation.annotation
-    }
+    { metaconsAnnotation | keyword = keyword }

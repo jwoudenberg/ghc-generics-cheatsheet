@@ -100,7 +100,7 @@ parseUrl url =
         annotationParser example annotation =
             Url.Parser.map
                 (AnnotationPage example annotation)
-                (Url.Parser.s (toParam annotation.keyword))
+                (Url.Parser.s annotation.path)
     in
     Url.Parser.parse parser url
         |> Maybe.withDefault IndexPage
@@ -118,7 +118,7 @@ urlForPage page =
                     [ example.path ]
 
                 AnnotationPage example annotation ->
-                    [ example.path, toParam annotation.keyword ]
+                    [ example.path, annotation.path ]
     in
     "/" ++ Url.Builder.relative segments []
 
@@ -545,11 +545,7 @@ replaceWithHtml keywords string =
 
 keywordClass : String -> String
 keywordClass str =
-    "keyword-" ++ toParam str
-
-
-toParam : String -> String
-toParam str =
-    String.toLower str
+    "keyword-"
+        ++ String.toLower str
         |> String.replace " " "-"
         |> String.replace "'" ""
