@@ -75,6 +75,7 @@ examples =
             , constructorNameAnnotation "Rainy"
             , typeinstanceAnnotation
             ]
+                ++ sumAnnotations
       }
     , { path = "boardgame"
       , originalType =
@@ -244,6 +245,72 @@ k1Annotation =
         ```
         """
     }
+
+
+sumAnnotations : List Annotation
+sumAnnotations =
+    [ ":+:", "L1", "R1" ]
+        |> List.map
+            (\keyword ->
+                { path = "sum"
+                , keyword = keyword
+                , annotation =
+                    """
+                    # `:+:` is `Either` by another name (almost)
+
+                    Check this out:
+
+                    ```haskell
+                    data Either a b   = Left a    | Right b
+                    data (:+:)  a b p = L1  (a p) | R1   (b p)
+                    ```
+
+                    Apart from the type and constructor names `:+:` and
+                    `Either` are almost identical. If it weren't for that pesky
+                    `p` Generics insists on carrying around, Generics could
+                    have used the `Either` instead of inventing its own.
+
+                    `:+:` is used to construct a type that has multiple
+                    constructors, Such a type is sometimes refered to an _ADT_
+                    or _sum type_ (that's why there's a plus in the type). In
+                    the generics representation of a type with two constructors
+                    each constructor will end up on one side of the `:+:`.
+
+                    If a type has more than two constructors it will take
+                    multiple `:+:` two combine them all together. Haskell will
+                    build a tree of `:+:` to contain all of them.
+
+                    ```haskell
+                    data DoSpell = Chant Text | Smash Relic | Drink Potion
+                    
+                    -- Leaving out wrappers like M1 and K1 the generics
+                    -- representation of `Color` will look something like this:
+                    -- 
+                    --     Text :+: (Relic :+: Potion)
+                    --
+                    -- If Generics has used `Either` it would have looked like
+                    -- this:
+                    --
+                    --     Either Text (Either Relic Potion)
+                    ```
+
+                    What about the values of these types?
+                    What do their generics representations look like?
+                    Below we show one example for each choice of constructor.
+                    For familiarity we again include what things would have
+                    looked like if Generics had gone with `Either` for
+                    representing sum types.
+
+                    | value              | `:*:` representation | `Either` representation    |
+                    | ------------------ | -------------------- | -------------------------- |
+                    | `Chant "AWAKEN!"`  | `L1 "Awaken"`        | `Left "Awaken"`            |
+                    | `Smash Medallion`  | `R1 (L1 Medallion)`  | `Right (Left Medallion)`   |
+                    | `Drink Pollyjuice` | `R1 (R1 Pollyjuice)` | `Right (Right Pollyjuice)` |
+
+                    
+                    """
+                }
+            )
 
 
 metadataAnnotation : Annotation
