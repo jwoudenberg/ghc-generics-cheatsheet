@@ -401,18 +401,13 @@ htmlifyExample example =
 viewExampleText : (Authored.Example String -> String) -> Authored.Example String -> Html msg
 viewExampleText getString example =
     let
-        colors =
-            colorscheme
-                ++ List.repeat (List.length example.annotations) (Css.batch [])
-
         replacements =
-            List.map2
-                (\annotation color -> ( annotation.keyword, formatKeyword annotation color ))
+            List.map
+                (\annotation -> ( annotation.keyword, formatKeyword annotation ))
                 example.annotations
-                colors
 
-        formatKeyword : Authored.Annotation -> Css.Style -> Html msg
-        formatKeyword annotation color =
+        formatKeyword : Authored.Annotation -> Html msg
+        formatKeyword annotation =
             Html.span
                 [ Attr.css [ Css.display Css.inlineBlock ]
                 ]
@@ -421,7 +416,6 @@ viewExampleText getString example =
                     , Attr.css
                         [ Css.color Css.inherit
                         , Css.textDecoration Css.none
-                        , color
                         , Css.cursor Css.pointer
                         , Css.borderRadius (Css.px 4)
                         , Css.display Css.block
