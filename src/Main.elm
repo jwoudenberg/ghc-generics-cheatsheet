@@ -415,7 +415,8 @@ htmlifyExample example =
         withHighlights code =
             Html.div
                 [ Attr.css
-                    [ Css.Global.descendants <|
+                    [ Css.color (Css.hex "#444")
+                    , Css.Global.descendants <|
                         List.map2
                             (\keyword color ->
                                 Css.Global.class (keywordClass keyword) [ color ]
@@ -460,7 +461,9 @@ viewExampleText getString example =
         formatKeyword : Authored.Annotation -> Html msg
         formatKeyword annotation =
             Html.span
-                [ Attr.css [ Css.display Css.inlineBlock ]
+                [ Attr.css
+                    [ Css.display Css.inlineBlock
+                    ]
                 ]
                 [ Html.a
                     [ Attr.href (urlForPage (AnnotationPage example annotation))
@@ -471,8 +474,10 @@ viewExampleText getString example =
                         , Css.cursor Css.pointer
                         , Css.borderRadius (Css.px 4)
                         , Css.display Css.block
-                        , Css.padding (Css.px 15)
-                        , Css.margin (Css.px -15)
+                        , Css.padding (Css.px 10)
+                        , Css.margin (Css.px -10)
+                        , Css.lineHeight (Css.em 2)
+                        , Css.color (Css.hex "#000")
                         , Css.hover
                             [ Css.textDecoration Css.underline
                             ]
