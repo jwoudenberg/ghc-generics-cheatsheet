@@ -225,7 +225,7 @@ viewPage page =
                     [ Attr.css
                         [ Css.width (Css.px 700)
                         , Css.backgroundColor (Css.hex "#fff")
-                        , Css.padding (Css.px 10)
+                        , Css.padding (Css.px 20)
                         , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
                         , Css.borderRadius (Css.px 2)
                         , Css.margin2 (Css.px 10) Css.auto
@@ -250,8 +250,8 @@ viewPage page =
                                 , Css.color (Css.hex "#fff")
                                 , Css.lineHeight (Css.em 1.4)
                                 , Css.display Css.block
-                                , Css.padding2 (Css.px 10) (Css.px 20)
-                                , Css.margin2 Css.zero (Css.px -10)
+                                , Css.padding2 (Css.px 20) (Css.px 30)
+                                , Css.margin2 Css.zero (Css.px -20)
                                 ]
                             , Css.Global.typeSelector "table"
                                 [ Css.margin (Css.px 10)
