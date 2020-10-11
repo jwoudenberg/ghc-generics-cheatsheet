@@ -268,7 +268,7 @@ sumAnnotations =
                     Apart from the type and constructor names `:+:` and
                     `Either` are almost identical. If it weren't for that pesky
                     `p` Generics insists on carrying around, Generics could
-                    have used the `Either` instead of inventing its own.
+                    have used the `Either` type instead of inventing its own.
 
                     `:+:` is used to construct a type that has multiple
                     constructors, Such a type is sometimes refered to an _ADT_
@@ -301,7 +301,7 @@ sumAnnotations =
                     looked like if Generics had gone with `Either` for
                     representing sum types.
 
-                    | value              | `:*:` representation | `Either` representation    |
+                    | value              | `:+:` representation | `Either` representation    |
                     | ------------------ | -------------------- | -------------------------- |
                     | `Chant "AWAKEN!"`  | `L1 "AWAKEN!"`       | `Left "AWAKEN!"`           |
                     | `Smash Medallion`  | `R1 (L1 Medallion)`  | `Right (Left Medallion)`   |
