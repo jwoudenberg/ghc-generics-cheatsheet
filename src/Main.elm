@@ -292,13 +292,17 @@ viewSummary example =
                 , Css.padding (Css.px 10)
                 ]
             ]
-            [ viewExampleText .originalType example
+            [ (htmlifyExample example).originalType
             ]
         ]
 
 
 viewExample : Authored.Example String -> Html Msg
 viewExample example =
+    let
+        htmlExample =
+            htmlifyExample example
+    in
     Html.table
         [ Attr.css
             [ Css.minWidth (Css.vw 100)
@@ -314,13 +318,13 @@ viewExample example =
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Type" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .originalType example ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .genericsType example ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.originalType ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.genericsType ]
             ]
         , Html.tr []
             [ Html.th [ Attr.css [ headerStyles ] ] [ Html.text "Example Value" ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .originalValue example ]
-            , Html.td [ Attr.css [ cellStyles ] ] [ viewExampleText .genericsValue example ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.originalValue ]
+            , Html.td [ Attr.css [ cellStyles ] ] [ htmlExample.genericsValue ]
             ]
         ]
 
@@ -380,6 +384,17 @@ type Page
 type Msg
     = NavigateTo Browser.UrlRequest
     | NavigatedTo Url
+
+
+htmlifyExample : Authored.Example String -> Authored.Example (Html Msg)
+htmlifyExample example =
+    { path = example.path
+    , originalType = viewExampleText .originalType example
+    , originalValue = viewExampleText .originalValue example
+    , genericsType = viewExampleText .genericsType example
+    , genericsValue = viewExampleText .genericsValue example
+    , annotations = example.annotations
+    }
 
 
 viewExampleText : (Authored.Example String -> String) -> Authored.Example String -> Html msg
