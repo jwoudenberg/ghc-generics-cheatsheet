@@ -128,6 +128,7 @@ examples =
             , metadataAnnotation
             , metaconsAnnotation
             , metaselAnnotation
+            , productAnnotation
             , typeNameAnnotation "BoardGame"
             , constructorNameAnnotation "Stats"
             , fieldNameAnnotation "name"
@@ -258,27 +259,23 @@ sumAnnotations =
                     """
                     # `:+:` is `Either` by another name (almost)
 
-                    Check this out:
+                    `:+:` combines types in the same way that `Either` does.
+                    The only difference is `:+:` carries around an extra `p` parameter.
 
                     ```haskell
                     data Either a b   = Left a    | Right b
                     data (:+:)  a b p = L1  (a p) | R1   (b p)
                     ```
 
-                    Apart from the type and constructor names `:+:` and
-                    `Either` are almost identical. If it weren't for that pesky
-                    `p` Generics insists on carrying around, Generics could
-                    have used the `Either` type instead of inventing its own.
-
-                    `:+:` is used to construct a type that has multiple
-                    constructors, Such a type is sometimes refered to an _ADT_
+                    `:+:` is used to represent a type that has multiple
+                    constructors. Such a type is sometimes refered to an _ADT_
                     or _sum type_ (that's why there's a plus in the type). In
                     the generics representation of a type with two constructors
                     each constructor will end up on one side of the `:+:`.
 
                     If a type has more than two constructors it will take
                     multiple `:+:` two combine them all together. Haskell will
-                    build a tree of `:+:` to contain all of them.
+                    build a tree using `:+:` to contain all of them.
 
                     ```haskell
                     data DoSpell = Chant Text | Smash Relic | Drink Potion
@@ -287,30 +284,71 @@ sumAnnotations =
                     -- representation of `Color` will look something like this:
                     -- 
                     --     Text :+: (Relic :+: Potion)
-                    --
-                    -- If Generics has used `Either` it would have looked like
-                    -- this:
-                    --
-                    --     Either Text (Either Relic Potion)
                     ```
 
-                    What about the values of these types?
-                    What do their generics representations look like?
-                    Below we show one example for each choice of constructor.
-                    For familiarity we again include what things would have
-                    looked like if Generics had gone with `Either` for
-                    representing sum types.
+                    This is similar to how we might define `DoSpell` as a type
+                    synonym in a hypothetical language like Haskell, but without
+                    support for custom types:
 
-                    | value              | `:+:` representation | `Either` representation    |
+                    ```haskell
+                    type DoSpellWorse = Either Text (Either Relic Potion)
+                    ```
+
+                    Values of `:*:` are created using `L1` and `R1`
+                    constructors, which function the same as the `Left` and
+                    `Right` constructors of the `Either` type. Below are three
+                    examples, each using a different constructor of the
+                    `DoSpell` example type above.
+
+                    | `DoSpell` value    | `Rep DoSpell` value  | `DoSpellWorse` value       |
                     | ------------------ | -------------------- | -------------------------- |
                     | `Chant "AWAKEN!"`  | `L1 "AWAKEN!"`       | `Left "AWAKEN!"`           |
                     | `Smash Medallion`  | `R1 (L1 Medallion)`  | `Right (Left Medallion)`   |
                     | `Drink Pollyjuice` | `R1 (R1 Pollyjuice)` | `Right (Right Pollyjuice)` |
-
-                    
                     """
                 }
             )
+
+
+productAnnotation : Annotation
+productAnnotation =
+    { path = "product"
+    , keyword = ":*:"
+    , annotation =
+        """
+        # `:*:` is a tuple (almost)
+
+        `:*:` is used to combine two types in the same way a tuple does.
+        The only difference is that `:*:` carries around an additional `p`
+        parameter.
+
+        ```hs
+        data (,)   a b   = (,)    a     b
+        data (:*:) a b p = (:*:) (a p) (b p)
+        ```
+
+        Haskell will use `:*:` two represent constructors with multiple
+        parameters. These can be regular parameters or fields of a record.
+        Types with multiple parameters are sometimes called _product types_,
+        hence the multiplication symbol in `:*:`.
+
+        ```hs
+        data Ghost = Ghost { haunt :: Coords, opacity :: Double }
+        data Monster = Monster Species Odor HidingPlace
+        ```
+
+        In the generics representation of a contructor with two parameters, like
+        `Ghost`, those parameters land on opposite sides of a single `:*:`. If
+        the constructor has three or more parameters, like `Monster`, then it
+        takes multiple `:*:` to combine them all. The generics representation
+        of `Monster` looks like this:
+
+        ```
+        -- pseudo code below, because wrappers like M1 and K1 are omitted!
+        type instance Rep Monster = Species :*: (Odor :*: HidingPlace)
+        ```
+        """
+    }
 
 
 metadataAnnotation : Annotation

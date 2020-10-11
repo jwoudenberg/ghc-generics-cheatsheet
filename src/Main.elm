@@ -478,7 +478,6 @@ viewExampleText getString example =
                         , Css.display Css.block
                         , Css.padding (Css.px 10)
                         , Css.margin (Css.px -10)
-                        , Css.lineHeight (Css.em 2)
                         , Css.color (Css.hex "#000")
                         , Css.hover
                             [ Css.textDecoration Css.underline
@@ -493,7 +492,14 @@ viewExampleText getString example =
         |> replaceWithHtml replacements
         |> (\{ keywordsFound, result } ->
                 { keywordsFound = keywordsFound
-                , result = Html.code [ Attr.css [ Css.whiteSpace Css.pre ] ] result
+                , result =
+                    Html.code
+                        [ Attr.css
+                            [ Css.lineHeight (Css.em 1.7)
+                            , Css.whiteSpace Css.pre
+                            ]
+                        ]
+                        result
                 }
            )
 
