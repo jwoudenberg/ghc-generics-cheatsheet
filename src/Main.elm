@@ -259,10 +259,12 @@ viewPage page =
                                 ]
                             , Css.Global.typeSelector "td"
                                 [ Css.paddingRight (Css.em 2)
+                                , Css.verticalAlign Css.top
                                 ]
                             , Css.Global.typeSelector "th"
                                 [ Css.paddingRight (Css.em 2)
                                 , Css.textAlign Css.left
+                                , Css.verticalAlign Css.top
                                 ]
                             ]
                         ]

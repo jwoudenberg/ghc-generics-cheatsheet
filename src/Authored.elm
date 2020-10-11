@@ -200,7 +200,7 @@ metadataAnnotation =
     { keyword = "'MetaData"
     , annotation =
         """
-        # 'MetaData describes a type
+        # `'MetaData` describes a type
 
         The `'MetaData` parameters provide information about the original type.
 
@@ -210,7 +210,7 @@ metadataAnnotation =
 
         | parameter   | meaning                                                              |
         | ----------- | -------------------------------------------------------------------- |
-        | typename    | The name of the type. For `data Foo` this is "foo"                   |
+        | typename    | The name of the type. For `data Unicorn` this is `Unicorn`           |
         | modulename  | The module in which this type is defined, e.g. "My.Module"           |
         | packagename | The package in which this type is defined, e.g. "my-package"         |
         | isnewtype   | `'True` if defined using `newtype`, `'False` if defined using `data` |
@@ -241,6 +241,36 @@ metaconsAnnotation =
     { keyword = "'MetaCons"
     , annotation =
         """
+        # `'MetaCons` describes a constructor
+
+        `'MetaCons` contains information about a single constructor of a type.
+
+        ```haskell
+        MetaCons constructorname fixity isrecord
+        ```
+
+        | parameter       | meaning                                                                   |
+        | --------------- | ------------------------------------------------------------------------- |
+        | constructorname | The name of the constructor. For `data Id = MkId` this is `MkId`          |
+        | fixity          | The constructor's fixity                                                  |
+        | isrecord        | `'True` if this constructor is a record: `data Rec = Rec { field : Int }` |
+
+        The `fixity` parameter is only relevant for constructors made up entirely out of symbols.
+        `NonEmpty` is one example of a type that uses such a constructor:
+
+        ```haskell
+        data NonEmpty a = a :| [a]
+        ```
+
+        The name of `NonEmpty`'s single constructor is `:|`.
+        Because it's made up entirely of symbols Haskell allows us to write it in between its arguments,
+        and calls such functions _infix operators_.
+        The 'fixity' field provides information about how strongly the constructor binds its arguments.
+        Haskell uses this information to figure out where to put the parens in expressions with multiple operators like this:
+
+        ```haskell
+        1 :| [2, 3] <> [4, 5]
+        ```
         """
     }
 
