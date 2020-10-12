@@ -67,6 +67,7 @@ examples =
       , genericsValue = "M1 (R1 (L1 (M1 U1)))"
       , annotations =
             [ m1Annotation
+            , u1Annotation
             , metadataAnnotation
             , metaconsAnnotation
             , typeNameAnnotation "Weather"
@@ -156,6 +157,7 @@ examples =
       , genericsValue = "n/a"
       , annotations =
             [ m1Annotation
+            , v1Annotation
             , metadataAnnotation
             , typeNameAnnotation "Unicorn"
             , typeinstanceAnnotation
@@ -243,6 +245,90 @@ k1Annotation =
 
         ```haskell
         type Rec0 = K1 R
+        ```
+        """
+    }
+
+
+u1Annotation : Annotation
+u1Annotation =
+    { path = "u1"
+    , keyword = "U1"
+    , annotation =
+        """
+        # `U1` sits in constructors without params
+
+        Suppose we have the following type along with a value for that type:
+        
+        ```haskell
+        data ISBN = ISBN Int
+
+        book :: ISBN
+        book = ISBN 9780441478125
+        ```
+
+        The generics representation of that `book` value will look like this:
+
+        ```haskell
+        type  parameter      nested
+        info   info           value
+         |      |               |
+        M1 (M1 (M1 (K1 9780441478125)))
+             |       |
+        constructor  nested type
+           info       wrapper
+        ```
+
+        Now consider another type with only a single constructor, but not parameter:
+
+        ```haskell
+        data Carrot = Carrot
+
+        carrot :: Carrot
+        carrot = Carrot
+        ```
+
+        We expect the generics representation of `carrot` to also contain the 
+        `M1` wrappers with the type and constructor information, but what do we
+        nest inside?
+
+        ```hs
+        M1 (M1 ( ??? ))
+        ```
+
+        The answer: `U1`. It's a lot like `()` (unit): a filler type.
+        It's definition is:
+        
+        ```hs
+        data U1 p = U1
+        ```
+        """
+    }
+
+
+v1Annotation : Annotation
+v1Annotation =
+    { path = "v1"
+    , keyword = "V1"
+    , annotation =
+        """
+        # `V1` represents types without constructors
+
+        Haskell allows us to define types without constructors:
+
+        ```haskell
+        data Unicorn
+        ```
+
+        Without constructors it's impossible to create values of this type,
+        but they can be useful for type-level programming.
+
+        For generics representations of types like `Unicorn`, we need to put
+        a type in the spot where normally the type's constructors would go.
+        That type is `V1`.
+
+        ```
+        data V1 p
         ```
         """
     }
