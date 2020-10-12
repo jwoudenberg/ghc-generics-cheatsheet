@@ -1,4 +1,4 @@
-module Authored exposing (Annotation, Example, examples)
+module Authored exposing (Annotation, Example, about, examples)
 
 
 type alias Example a =
@@ -692,3 +692,24 @@ wrappedTypeAnnotation keyword =
 wrappedValueAnnotation : String -> Annotation
 wrappedValueAnnotation keyword =
     { k1Annotation | keyword = keyword }
+
+
+about : String
+about =
+    """
+    # A GHC Generics Cheatsheet
+
+    Generics allow us to write Haskell code that can work with any type. An example is the `aeson` library which is able to automatically create JSON encoders and decoders for almost all Haskell types. How does it pull that off?
+
+    When writing Haskell we can define our own types. There's no way the author of a library like `aeson` is able to write out separate logic for every single type users of the library might come up with. Instead `aeson` makes use of `GHC.Generics`.
+
+    `GHC.Generics` provides an alternative representation of types and values. We can convert our regular types and values into this alternative representation and back. The cool thing is that in this alternative representation we can express all types using 6 basic building blocks. The [generics documentation][generics] describes how to do that.
+
+    This site is intended to help create a fuzzy intuition for Generics, by showing some types and their generics representation side by side. Colored highlights are intended to help us see where the different bits of the original type end up in the generics representation.
+
+    I hope this is useful to you! If you have any questions or feedback I'd love to hear it.
+    Please create an issue in the [Github repo of this site][repo].
+
+    [generics]: https://www.stackage.org/haddock/lts-16.18/base-4.13.0.0/GHC-Generics.html
+    [repo]: https://github.com/jwoudenberg/ghc-generics-cheatsheet
+    """

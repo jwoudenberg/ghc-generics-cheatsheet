@@ -88,6 +88,7 @@ parseUrl url =
         parser =
             Url.Parser.oneOf <|
                 Url.Parser.map IndexPage Url.Parser.top
+                    :: Url.Parser.map AboutPage (Url.Parser.s "about")
                     :: List.map exampleParser htmlExamples
 
         exampleParser example =
@@ -113,6 +114,9 @@ urlForPage page =
             case page of
                 IndexPage ->
                     []
+
+                AboutPage ->
+                    [ "about" ]
 
                 ExamplePage example ->
                     [ example.path ]
@@ -190,6 +194,19 @@ viewPage page =
                         ]
                     ]
                     [ Html.text "GHC Generics Cheat Sheet" ]
+                , Html.a
+                    [ Attr.href (urlForPage AboutPage)
+                    , Attr.css
+                        [ Css.textAlign Css.center
+                        , Css.display Css.block
+                        , headerStyles
+                        , Css.margin (Css.px 30)
+                        , Css.fontSize (Css.em 1.2)
+                        , Css.textDecoration Css.none
+                        ]
+                    ]
+                    [ Html.text "What is this?"
+                    ]
                 , Html.ul
                     [ Attr.css
                         [ Css.listStyle Css.none
@@ -203,75 +220,83 @@ viewPage page =
         ExamplePage example ->
             viewExample example
 
-        AnnotationPage example annotation ->
-            let
-                options : Markdown.Options
-                options =
-                    { githubFlavored = Just { tables = True, breaks = False }
-                    , defaultHighlighting = Nothing
-                    , sanitize = True
-                    , smartypants = True
-                    }
+        AnnotationPage example { annotation } ->
+            viewAnnotationPage (ExamplePage example) annotation
 
-                markdown =
-                    annotation.annotation
-                        |> String.Extra.unindent
-                        |> String.trim
-                        |> Markdown.toHtmlWith options []
-                        |> Html.fromUnstyled
-            in
-            Html.div []
-                [ viewBackArrow (ExamplePage example)
-                , Html.div
-                    [ Attr.css
-                        [ Css.width (Css.px 700)
-                        , Css.backgroundColor (Css.hex "#fff")
-                        , Css.padding (Css.px 20)
-                        , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
-                        , Css.borderRadius (Css.px 2)
-                        , Css.margin2 (Css.px 10) Css.auto
-                        , Css.Global.descendants
-                            [ Css.Global.typeSelector "h1"
-                                [ Css.marginTop (Css.px 10)
-                                , Css.color (Css.hex "#333")
-                                ]
-                            , Css.Global.typeSelector "p"
-                                [ Css.fontSize (Css.em 1.1)
-                                ]
-                            , Css.Global.typeSelector "a"
-                                [ Css.color Css.inherit
-                                , Css.color (Css.hex "#ee5185")
-                                , Css.textDecoration Css.none
-                                ]
-                            , Css.Global.typeSelector "code"
-                                [ Css.fontSize (Css.em 1.1)
-                                ]
-                            , Css.Global.typeSelector "pre"
-                                [ Css.backgroundColor (Css.hex "#333")
-                                , Css.color (Css.hex "#fff")
-                                , Css.lineHeight (Css.em 1.4)
-                                , Css.display Css.block
-                                , Css.padding2 (Css.px 20) (Css.px 30)
-                                , Css.margin2 Css.zero (Css.px -20)
-                                ]
-                            , Css.Global.typeSelector "table"
-                                [ Css.margin (Css.px 10)
-                                ]
-                            , Css.Global.typeSelector "td"
-                                [ Css.paddingRight (Css.em 2)
-                                , Css.verticalAlign Css.top
-                                ]
-                            , Css.Global.typeSelector "th"
-                                [ Css.paddingRight (Css.em 2)
-                                , Css.textAlign Css.left
-                                , Css.verticalAlign Css.top
-                                ]
-                            ]
+        AboutPage ->
+            viewAnnotationPage IndexPage Authored.about
+
+
+viewAnnotationPage : Page a -> String -> Html Msg
+viewAnnotationPage backPage text =
+    let
+        options : Markdown.Options
+        options =
+            { githubFlavored = Just { tables = True, breaks = False }
+            , defaultHighlighting = Nothing
+            , sanitize = True
+            , smartypants = True
+            }
+
+        markdown =
+            text
+                |> String.Extra.unindent
+                |> String.trim
+                |> Markdown.toHtmlWith options []
+                |> Html.fromUnstyled
+    in
+    Html.div []
+        [ viewBackArrow backPage
+        , Html.div
+            [ Attr.css
+                [ Css.width (Css.px 700)
+                , Css.backgroundColor (Css.hex "#fff")
+                , Css.padding (Css.px 20)
+                , Css.boxShadow4 (Css.px 1) (Css.px 1) (Css.px 2) (Css.hex "#333")
+                , Css.borderRadius (Css.px 2)
+                , Css.margin2 (Css.px 10) Css.auto
+                , Css.Global.descendants
+                    [ Css.Global.typeSelector "h1"
+                        [ Css.marginTop (Css.px 10)
+                        , Css.color (Css.hex "#333")
+                        ]
+                    , Css.Global.typeSelector "p"
+                        [ Css.fontSize (Css.em 1.1)
+                        ]
+                    , Css.Global.typeSelector "a"
+                        [ Css.color Css.inherit
+                        , Css.color (Css.hex "#ee5185")
+                        , Css.textDecoration Css.none
+                        ]
+                    , Css.Global.typeSelector "code"
+                        [ Css.fontSize (Css.em 1.1)
+                        ]
+                    , Css.Global.typeSelector "pre"
+                        [ Css.backgroundColor (Css.hex "#333")
+                        , Css.color (Css.hex "#fff")
+                        , Css.lineHeight (Css.em 1.4)
+                        , Css.display Css.block
+                        , Css.padding2 (Css.px 20) (Css.px 30)
+                        , Css.margin2 Css.zero (Css.px -20)
+                        ]
+                    , Css.Global.typeSelector "table"
+                        [ Css.margin (Css.px 10)
+                        ]
+                    , Css.Global.typeSelector "td"
+                        [ Css.paddingRight (Css.em 2)
+                        , Css.verticalAlign Css.top
+                        ]
+                    , Css.Global.typeSelector "th"
+                        [ Css.paddingRight (Css.em 2)
+                        , Css.textAlign Css.left
+                        , Css.verticalAlign Css.top
                         ]
                     ]
-                    [ markdown
-                    ]
                 ]
+            ]
+            [ markdown
+            ]
+        ]
 
 
 viewSummary : Authored.Example (Html Msg) -> Html Msg
@@ -376,6 +401,7 @@ type alias Model =
 
 type Page a
     = IndexPage
+    | AboutPage
     | ExamplePage (Authored.Example a)
     | AnnotationPage (Authored.Example a) Authored.Annotation
 
