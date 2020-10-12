@@ -294,7 +294,7 @@ sumAnnotations =
                     type DoSpellWorse = Either Text (Either Relic Potion)
                     ```
 
-                    Values of `:*:` are created using `L1` and `R1`
+                    Values of `:+:` are created using `L1` and `R1`
                     constructors, which function the same as the `Left` and
                     `Right` constructors of the `Either` type. Below are three
                     examples, each using a different constructor of the
@@ -346,6 +346,14 @@ productAnnotation =
         ```
         -- pseudo code below, because wrappers like M1 and K1 are omitted!
         type instance Rep Monster = Species :*: (Odor :*: HidingPlace)
+        ```
+
+        A tuple value `(2, "Hi!")` looks a lot like its type `(Int, Text)`.
+        It's the same with `:*:`. A value of the zombie type, again omitting K1
+        and M1 wrappers, would look like this:
+        
+        ```haskell
+        monster = Zombie :*: (Decay :*: UnderBed)
         ```
         """
     }
