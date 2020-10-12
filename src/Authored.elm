@@ -175,7 +175,7 @@ m1Annotation =
         # `M1` contains metadata
 
         The `M1` type attaches metadata to the type it wraps.
-        We see a lot of these in Generics representations,
+        We see a lot of `M1`s in Generics representations,
         because every type, type constructor, and type parameter is wrapped in one.
         
         The definition of `M1` is:
@@ -195,7 +195,7 @@ m1Annotation =
         As you can see there's a lot of information attached here.
         To learn more about what it all means open the details pages for one of the metadata types.
 
-        Beware that `M1` sometimes goes by the name `D1`, `C1`, or `S1`.
+        Beware that `M1` sometimes goes by the names `D1`, `C1`, and `S1`.
         These are type synonyms for `M1` with the `kind` parameter pre-applied:
 
         ```haskell
@@ -213,10 +213,10 @@ k1Annotation =
     , keyword = "K1"
     , annotation =
         """
-        # `K1` wraps included types
+        # `K1` wraps nested types
 
         Types we write often contain other types. For example, the `Treasure`
-        type below contains the `Coords` and `Int` types.
+        type below nests the `Coords` and `Int` types.
 
         ```haskell
         data Treasure = Treasure { where :: Coords, guilders :: Int }
@@ -279,7 +279,7 @@ u1Annotation =
            info       wrapper
         ```
 
-        Now consider another type with only a single constructor, but not parameter:
+        Now consider another type with only a single constructor, but no parameter:
 
         ```haskell
         data Carrot = Carrot
@@ -355,13 +355,13 @@ sumAnnotations =
 
                     `:+:` is used to represent a type that has multiple
                     constructors. Such a type is sometimes refered to an _ADT_
-                    or _sum type_ (that's why there's a plus in the type). In
+                    or _sum type_ (that's why there's a plus in `:+:`). In
                     the generics representation of a type with two constructors
                     each constructor will end up on one side of the `:+:`.
 
                     If a type has more than two constructors it will take
                     multiple `:+:` two combine them all together. Haskell will
-                    build a tree using `:+:` to contain all of them.
+                    build a tree using `:+:` to contain all constructors.
 
                     ```haskell
                     data DoSpell = Chant Text | Smash Relic | Drink Potion
@@ -381,12 +381,12 @@ sumAnnotations =
                     ```
 
                     Values of `:+:` are created using `L1` and `R1`
-                    constructors, which function the same as the `Left` and
-                    `Right` constructors of the `Either` type. Below are three
-                    examples, each using a different constructor of the
+                    constructors, which function identically to as the `Left`
+                    and `Right` constructors of the `Either` type. Below are
+                    three examples, each using a different constructor of the
                     `DoSpell` example type above.
 
-                    | `DoSpell` value    | `Rep DoSpell` value  | `DoSpellWorse` value       |
+                    | `DoSpell` value    | `Rep DoSpell` value  | `DoSpellWorse` equivalent  |
                     | ------------------ | -------------------- | -------------------------- |
                     | `Chant "AWAKEN!"`  | `L1 "AWAKEN!"`       | `Left "AWAKEN!"`           |
                     | `Smash Medallion`  | `R1 (L1 Medallion)`  | `Right (Left Medallion)`   |
@@ -405,8 +405,8 @@ productAnnotation =
         # `:*:` is a tuple (almost)
 
         `:*:` is used to combine two types in the same way a tuple does.
-        The only difference is that `:*:` carries around an additional `p`
-        parameter.
+        The only difference is that `:*:` carries around the additional `p`
+        parameter that all Generics types carry around.
 
         ```hs
         data (,)   a b   = (,)    a     b
@@ -416,7 +416,8 @@ productAnnotation =
         Haskell will use `:*:` two represent constructors with multiple
         parameters. These can be regular parameters or fields of a record.
         Types with multiple parameters are sometimes called _product types_,
-        hence the multiplication symbol in `:*:`.
+        hence the multiplication symbol in `:*:`. Here's two examples of product
+        types.
 
         ```hs
         data Ghost = Ghost { haunt :: Coords, opacity :: Double }
@@ -436,7 +437,7 @@ productAnnotation =
 
         A tuple value `(2, "Hi!")` looks a lot like its type `(Int, Text)`.
         It's the same with `:*:`. A value of the zombie type, again omitting K1
-        and M1 wrappers, would look like this:
+        and M1 wrappers, looks like this:
         
         ```haskell
         monster = Zombie :*: (Decay :*: UnderBed)
@@ -468,15 +469,15 @@ metadataAnnotation =
 
         The prime in `'MetaData` isn't a typo and really part of the name.
         `'MetaData` gets this prime because it is defined in a peculiar way.
-        We usually define types using the keywords `type`, `newtype`, and `data`, but there's another way:
-        If we enable the `DataKinds` extension in a module GHC will create a type for each constructor in the module, with the same name as the constructor.
+        We usually define types using the keywords `type`, `newtype`, or `data`, but there's another way:
+        If we enable the `DataKinds` extension in a module GHC will create a type for each constructor in the module, with the same name as that constructor.
         That's why in the [documentation for `'MetaData`][metadata] we see it defined as a constructor of the `Meta` type.
 
         `DataKinds` will give us a type and a constructor with the same name.
         When we put a prime in front of the name we tell GHC we mean the type, not the constructor.
-        In most cases GHC is able to figure out from context whether we mean the type or constructor and we can omit the prime.
+        In most cases we can also omit the prime, and GHC will figure out whether we mean the constructor on the type based on where the name appears.
 
-        These automatically generated types `DataKinds` produces don't have any values
+        The generated types `DataKinds` produces don't have any values
         so their only real use is in phantom types, which is exactly how `'MetaData'` is used!
 
         If you're interested in learning more about `DataKinds` check out this [blog post on kinds][kinds].
@@ -568,7 +569,7 @@ metaselAnnotation =
 
         The `sourcestrictness` option tells us which of the three options above appears in the code.
         The `decidedstrictness` option tells us what strictness GHC decided for the parameter,
-        based on the code but also on compiler options, such as a the `StrictData` language extension.
+        based on the code but also on compiler options, such as the `StrictData` language extension.
 
         [unpackedness]: https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#unpack-pragma
         """
@@ -617,7 +618,7 @@ typeinstanceAnnotation =
         `Rep` is very similar to `HasManyValues`.
         It also takes a single argument (an original type) and returns another type (the generic representation).
         We can manually write a line `type instance Rep MyType` if we want,
-        but usually tell GHC it should do it for us by adding `deriving (Generic)` to a type.
+        but will usually let GHC do it for us by adding `deriving (Generic)` to a type.
         """
     }
 
@@ -701,7 +702,7 @@ about =
 
     Generics allow us to write Haskell code that can work with any type. An example is the `aeson` library which is able to automatically create JSON encoders and decoders for almost all Haskell types. How does it pull that off?
 
-    When writing Haskell we can define our own types. There's no way the author of a library like `aeson` is able to write out separate logic for every single type users of the library might come up with. Instead `aeson` makes use of `GHC.Generics`.
+    When writing Haskell we can define our own types. There's no way the author of a library like `aeson` is able to write out separate logic for every single type users of the library might come up with. Instead `aeson` makes use of the `GHC.Generics` module.
 
     `GHC.Generics` provides an alternative representation of types and values. We can convert our regular types and values into this alternative representation and back. The cool thing is that in this alternative representation we can express all types using 6 basic building blocks. The [generics documentation][generics] describes how to do that.
 
