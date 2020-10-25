@@ -4,6 +4,15 @@
     <title>Generics Cheatsheet</title>
     <meta charset="utf-8" />
     <script src="./main.js"></script>
+    <script>
+      window.goatcounter = {no_onload: true}
+
+      window.addEventListener('hashchange', function(e) {
+          window.goatcounter.count({
+              path: location.pathname + location.search + location.hash,
+          })
+      })
+    </script>
     <script data-goatcounter="https://generics.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   </head>
 
