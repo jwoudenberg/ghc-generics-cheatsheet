@@ -6,3 +6,4 @@ command = "elm make --optimize src/Main.elm --output public/main.js"
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
