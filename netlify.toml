@@ -1,6 +1,6 @@
 [build]
 publish = "public/"
-command = "elm make --optimize src/Main.elm --output public/index.html"
+command = "elm make --optimize src/Main.elm --output public/main.js"
 
 [[redirects]]
   from = "/*"

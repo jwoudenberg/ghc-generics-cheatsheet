@@ -5,3 +5,11 @@
 This repository contains code for a cheatsheet showing annotated generics representations of a couple of different types.
 
 It's live at [generics.jasperwoudenberg.com](https://generics.jasperwoudenberg.com).
+
+## Development
+
+To start a code-watcher, run:
+
+```
+elm-live src/Main.elm --pushstate --dir public -- --output public/main.js
+```
