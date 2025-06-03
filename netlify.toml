@@ -1,9 +1,0 @@
-[build]
-publish = "public/"
-command = "npx --yes --package=elm@0.19.1-5 elm make --optimize src/Main.elm --output public/main.js"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
